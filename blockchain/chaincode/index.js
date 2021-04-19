@@ -6,10 +6,10 @@
 
 'use strict';
 
-const fileAssetTransfer = require('fileAssetTransfer');
-const keyAssetTransfer = require('keyAssetTransfer');
+const fileAssetContract = require('./src/fileAssetContract');
+const keyAssetContract = require('./src/keyAssetContract');
 
-module.exports.FileAssetTransfer = fileAssetTransfer;
-module.exports.KeyAssetTransfer = keyAssetTransfer;
+module.exports.FileAssetContract = fileAssetContract;
+module.exports.KeyAssetContract = keyAssetContract;
 
-module.exports.contracts = [fileAssetTransfer, keyAssetTransfer];
+module.exports.contracts = [fileAssetContract, keyAssetContract];
