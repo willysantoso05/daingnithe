@@ -16,9 +16,11 @@
     "express": "^4.17.1",
     "fabric-ca-client": "^2.2.5",
     "fabric-network": "^2.2.5",
+    "ipfs-http-client": "^49.0.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.4",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "shamirs-secret-sharing": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "^7.24.0"
