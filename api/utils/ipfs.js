@@ -3,16 +3,18 @@ const { globSource } = ipfsClient;
 const ipfsEndPoint = 'http://localhost:5001'
 const ipfs = ipfsClient(ipfsEndPoint);
 
+const fs = require('fs');
 const crypto = require('crypto');
 
 const {encryptAES, decryptAES, encryptRSA, decryptRSA} = require("./encryption");
 
-async function uploadFileEncrypted(bufferFile, ipfspath) {
+async function uploadFileEncrypted(file, ipfspath) {
     try {
+        const buff = fs.readFileSync(file);
         const key = crypto.randomBytes(16).toString('hex'); // 16 bytes -> 32 chars
         const iv = crypto.randomBytes(8).toString('hex');   // 8 bytes -> 16 chars
         const ekey = encryptRSA(key); // 32 chars -> 684 chars
-        const ebuff = encryptAES(bufferFile, key, iv);  
+        const ebuff = encryptAES(buff, key, iv);  
         const content = Buffer.concat([ // headers: encrypted key and IV (len: 700=684+16)
             Buffer.from(ekey, 'utf8'),   // char length: 684
             Buffer.from(iv, 'utf8'),     // char length: 16
