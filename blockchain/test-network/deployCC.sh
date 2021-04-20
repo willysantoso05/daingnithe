@@ -1,0 +1,1 @@
+./network.sh deployCC -ccn basic -ccp ../chaincode -ccl javascript
