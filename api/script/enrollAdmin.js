@@ -14,7 +14,7 @@ const path = require('path');
 async function main() {
     try {
         // load the network configuration
-        const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
+        const ccpPath = path.resolve(__dirname, '..', '..', 'blockchain', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
         const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
 
         // Create a new CA client for interacting with the CA.
@@ -23,7 +23,7 @@ async function main() {
         const ca = new FabricCAServices(caInfo.url, { trustedRoots: caTLSCACerts, verify: false }, caInfo.caName);
 
         // Create a new file system based wallet for managing identities.
-        const walletPath = path.join(process.cwd(), 'wallet');
+        const walletPath = path.join(process.cwd(), '../wallet');
         const wallet = await Wallets.newFileSystemWallet(walletPath);
         console.log(`Wallet path: ${walletPath}`);
 
