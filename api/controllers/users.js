@@ -1,10 +1,6 @@
 const userModel = require('../models/users');
 const bcrypt = require('bcrypt'); 
 const jwt = require('jsonwebtoken');
-const { Wallets } = require('fabric-network');
-const FabricCAServices = require('fabric-ca-client');
-const fs = require('fs');
-const path = require('path');
 
 const enrollWalletUser = require('../script/enrollUser')
 
@@ -39,7 +35,7 @@ module.exports = {
             } else {
                 if(bcrypt.compareSync(req.body.password, userInfo.password)) {
                     const token = jwt.sign({userId: userInfo._id}, process.env.JWT_SECRET, { expiresIn: '1h' });
-                    res.json({status:"success", message: "user found!!!", data:{user: userInfo, token:token}});
+                    res.json({status:"success", message: "user found!!!", data:{id: userInfo._id, username: userInfo.username, token:token}});
                 }else{
                     res.json({status:"error", message: "Invalid username/password!!!", data:null});
                 }

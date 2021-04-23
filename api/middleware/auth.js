@@ -5,11 +5,9 @@ exports.auth = async (req, res, next) => {
     try {
         //get token from header: Bearer <token>
         const token = req.headers.authorization.split(" ")[1];
-        console.log(token)
 
         //verify this token was signed by your server
         const decodedToken = JWT.verify(token, process.env.JWT_SECRET);
-        console.log(decodedToken.userId)
         
         ///Get user details
         let user = await User.findById(decodedToken.userId);
