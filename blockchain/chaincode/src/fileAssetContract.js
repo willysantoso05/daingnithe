@@ -39,7 +39,7 @@ class fileAssetContract extends Contract {
     }
 
     // UpdateFileAsset
-    async UpdateFileAsset(ctx, userID, id, fileName, hashIPFS, sharedKey) {
+    async UpdateFileAsset(ctx, userID, id, fileName, hashIPFS, publicKey, sharedKey) {
         const assetString = await this.ReadAsset(ctx, id);
 
         let dt = new Date().toString();
@@ -55,6 +55,7 @@ class fileAssetContract extends Contract {
             // Update Field
             fileAsset.FileName = fileName;
             fileAsset.HashIPFS = hashIPFS;
+            fileAsset.PublicKey = publicKey;
             fileAsset.SharedKey = sharedKey;
             fileAsset.LastUpdated = dt;
         } catch (err) {
