@@ -24,7 +24,7 @@ class keyAssetContract extends Contract {
             LastUpdated: dt
         };
         ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
-        return JSON.stringify(fileAsset);
+        return JSON.stringify(keyAsset);
     }
 
     // ReadKeyAsset
