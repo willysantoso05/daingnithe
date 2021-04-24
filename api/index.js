@@ -1,38 +1,33 @@
 const express = require('express');
 const logger = require('morgan');
-const movies = require('./routes/movies') ;
+// const movies = require('./routes/movies') ;
 const users = require('./routes/users');
 const files = require('./routes/files');
 const bodyParser = require('body-parser');
 const mongoose = require('./config/database');
 const jwtAuth = require('./middleware/auth');
-require('dotenv').config();
+const fileUpload = require('express-fileupload');
 
-var jwt = require('jsonwebtoken');
+
 const app = express();
-app.set('secretKey', 'nodeRestApi'); // jwt secret token
-
 // connection to mongodb
 mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
 app.use(logger('dev'));
+app.use(fileUpload());
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/', function(req, res){
 	res.json({"message" : "Secure File System with Hyperledger Fabric and IPFS"});
 });
 
+
 // public route
 app.use('/users', users);
 
 // private route
 // app.use('/movies', jwtAuth.auth, movies);
-// app.use('/file', jwtAuth.auth, files);
-app.use('/file', files);
-
-// app.get('/favicon.ico', function(req, res) {
-//     res.sendStatus(204);
-// });
-
+app.use('/file', jwtAuth.auth, files);
+// app.use('/file', files);
 
 // express doesn't consider not found 404 as an error so we need to handle 404 explicitly
 // handle 404 error

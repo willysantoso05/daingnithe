@@ -10,7 +10,7 @@ const uploadFileController = require('../controllers/files/uploadFile');
 
 
 router.get('/', getAllFilesController.getAllFiles);
-router.post('/', uploadFileController.uploadFile);
+router.post('/', uploadFileController.uploads);
 // router.get('/:fileId', downloadFileController);
 
 // router.put('/:fileId', updateFileController);
