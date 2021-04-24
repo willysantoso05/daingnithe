@@ -6,54 +6,79 @@
 
 'use strict';
 
-const { Gateway, Wallets } = require('fabric-network');
-const path = require('path');
-const fs = require('fs');
+const {v4 : uuidv4} = require('uuid')
+const crypto = require('crypto');
+const sss = require('shamirs-secret-sharing')
 
+const encryption = require('../../utils/encryption');
+const ipfs = require('../../utils/ipfs');
+const createFileContract = require('../../script/file-contract/createFileContract');
+const createKeyContract = require('../../script/key-contract/createKeyContract');
 
-async function uploadFile(req, res, next) {
-    try {
-        // load the network configuration
-        const ccpPath = path.resolve(__dirname, '..', '..', '..', 'blockchain', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
-        const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
+const PATH = "/testing/";
 
-        // Create a new file system based wallet for managing identities.
-        const walletPath = path.join(process.cwd(), 'wallet');
-        const wallet = await Wallets.newFileSystemWallet(walletPath);
-        console.log(`Wallet path: ${walletPath}`);
+exports.uploadFile = async (req, res, next) => {
+    console.log(req.files.file);
+    const fileName = req.files.file.name;
+    const bufferFile = req.files.file.data;
+    const userId = req.user._id;
+    const walletId = req.user.username;
+    console.log(userId)
 
-        // Check to see if we've already enrolled the user.
-        const identity = await wallet.get('edward@gmail.com');
-        if (!identity) {
-            console.log('An identity for the user "edward@gmail.com" does not exist in the wallet');
-            console.log('Run the registerUser.js application before retrying');
-            return;
+    try{
+        //generate file id
+        const fileID = uuidv4()
+        console.log(fileID);
+
+        const ipfsPath = PATH + fileID.toString() + ".data";
+    
+        //generate keys
+        const {publicKey, privateKey} = encryption.generateKeys();
+
+        //encryption process
+        const key = crypto.randomBytes(16).toString('hex'); // 16 bytes -> 32 chars
+        const iv = crypto.randomBytes(8).toString('hex');   // 8 bytes -> 16 chars
+        const ekey = encryption.encryptRSA(key, publicKey); // 32 chars -> 684 chars
+        const ebuff = encryption.encryptAES(bufferFile, key, iv);
+
+        const content = Buffer.concat([ // headers: encrypted key and IV (len: 700=684+16)
+            Buffer.from(ekey, 'utf8'),   // char length: 684
+            Buffer.from(iv, 'utf8'),     // char length: 16
+            Buffer.from(ebuff, 'utf8')
+        ])
+
+        // const temp_key = encryption.decryptRSA(content.slice(0, 684).toString('utf8'), privateKey)
+        // const temp_iv = content.slice(684, 700).toString('utf8')
+        // const temp_econtent = content.slice(700).toString('utf8')
+        // const temp_ebuf = Buffer.from(temp_econtent, 'hex')
+        // const temp_content = encryption.decryptAES(temp_ebuf, temp_key, temp_iv)
+
+        //generate shared key
+        const secret = Buffer.from(privateKey)
+        const shares = sss.split(secret, { shares: 2, threshold: 2 })
+
+        //upload to IPFS
+        ipfs.uploadIPFS(ipfsPath, content);
+
+        //create file transaction
+        try {
+            createFileContract.createFileAsset(walletId, fileID, fileName, ipfsPath, publicKey, shares[0], userId, JSON.stringify("[]"));
+        } catch (err) {
+            res.json({status:"error", "error while invoke create file asset": err, data:null});
         }
 
-        // Create a new gateway for connecting to our peer node.
-        const gateway = new Gateway();
-        await gateway.connect(ccp, { wallet, identity: 'edward@gmail.com', discovery: { enabled: true, asLocalhost: true } });
+        const keyID = "KEY_" + uuidv4().toString();
 
-        // Get the network (channel) our contract is deployed to.
-        const network = await gateway.getNetwork('mychannel');
+        //create key transaction
+        try {
+            createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1]);
+        } catch (err) {
+            res.json({status:"error", "error while invoke create key asset": err, data:null});
+        }
 
-        // Get the contract from the network.
-        const contract = network.getContract('basic', 'fileAssetContract');
-
-        // Evaluate the specified transaction.
-        // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
-        // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-        const result = await contract.submitTransaction('CreateFileAsset', 'id','filename', 'publickey', 'hashIPFS', 'ownerID', 'sharedKey', 'ali');
-        console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
-
-        // Disconnect from the gateway.
-        await gateway.disconnect();
-        res.json({status:"success", message: "Found!!!", data:{result}});
-        
-    } catch (error) {
-        console.error(`Failed to evaluate transaction: ${error}`);
-        res.json({status:"FAILED", message: "Found!!!", data:{}});
+        res.json({status:"success", message: "uploading to IPFS", data:null});
+    } catch (err){
+        console.log(err);
+        res.json({status:"error", "error while uploading to IPFS": err, data:null});
     }
 }
-
-module.exports.uploadFile = uploadFile;
