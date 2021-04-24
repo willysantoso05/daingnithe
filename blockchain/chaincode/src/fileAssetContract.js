@@ -11,36 +11,36 @@ const { Contract } = require('fabric-contract-api');
 class fileAssetContract extends Contract {
 
     // CreateFileAsset
-    async CreateFileAsset(ctx, id, fileName, hashIPFS, ownerID, publicKey, sharedKey, grantedUserList) {
+    async CreateFileAsset(ctx, fileId, fileName, ipfsPath, publicKey, sharedKey, ownerID, accessUserList) {
         let dt = new Date().toString();
 
         const fileAsset = {
-            ID: id,
+            ID: fileId,
             FileName: fileName,
-            HashIPFS: hashIPFS,
-            OwnerID: ownerID,
+            IpfsPath: ipfsPath,
             PublicKey: publicKey,
             SharedKey: sharedKey,
-            GrantedUserList: grantedUserList,
+            OwnerID: ownerID,
+            AccessUserList: accessUserList,
             CreateDateTime: dt,
             LastUpdated: dt
         };
-        ctx.stub.putState(id, Buffer.from(JSON.stringify(fileAsset)));
+        ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
         return JSON.stringify(fileAsset);
     }
 
     // ReadFileAsset
-    async ReadFileAsset(ctx, id) {
-        const assetJSON = await ctx.stub.getState(id);
+    async ReadFileAsset(ctx, fileId) {
+        const assetJSON = await ctx.stub.getState(fileId);
         if (!assetJSON || assetJSON.length === 0) {
-            throw new Error(`The asset ${id} does not exist`);
+            throw new Error(`The asset ${fileId} does not exist`);
         }
         return assetJSON.toString();
     }
 
     // UpdateFileAsset
-    async UpdateFileAsset(ctx, userID, id, fileName, hashIPFS, publicKey, sharedKey) {
-        const assetString = await this.ReadAsset(ctx, id);
+    async UpdateFileAsset(ctx, userID, fileId, fileName, ipfsPath, publicKey, sharedKey) {
+        const assetString = await this.ReadAsset(ctx, fileId);
 
         let dt = new Date().toString();
         let fileAsset;
@@ -54,20 +54,20 @@ class fileAssetContract extends Contract {
 
             // Update Field
             fileAsset.FileName = fileName;
-            fileAsset.HashIPFS = hashIPFS;
+            fileAsset.IpfsPath = ipfsPath;
             fileAsset.PublicKey = publicKey;
             fileAsset.SharedKey = sharedKey;
             fileAsset.LastUpdated = dt;
         } catch (err) {
-            throw new Error(`id = ${id} data can't be processed`);
+            throw new Error(`id = ${fileId} data can't be processed`);
         }
 
         return ctx.stub.putState(id, Buffer.from(JSON.stringify(fileAsset)));
     }
 
     // UpdateFileAccessAsset for grant or revoke file access 
-    async UpdateFileAccessAsset(ctx, userID, id, sharedKey, grantedUserList) {
-        const assetString = await this.ReadAsset(ctx, id);
+    async UpdateFileAccessAsset(ctx, userID, fileId, sharedKey, accessUserList) {
+        const assetString = await this.ReadAsset(ctx, fileId);
 
         let dt = new Date().toString();
         let fileAsset;
@@ -81,18 +81,18 @@ class fileAssetContract extends Contract {
 
             // Update Field
             fileAsset.SharedKey = sharedKey;
-            fileAsset.GrantedUserList = grantedUserList;
+            fileAsset.AccessUserList = accessUserList;
             fileAsset.LastUpdated = dt;
         } catch (err) {
-            throw new Error(`id = ${id} data can't be processed`);
+            throw new Error(`id = ${fileId} data can't be processed`);
         }
 
-        return ctx.stub.putState(id, Buffer.from(JSON.stringify(fileAsset)));
+        return ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
     }
 
     // DeleteFileAsset
-    async DeleteFileAsset(ctx, userID, id) {
-        const assetString = await this.ReadAsset(ctx, id);
+    async DeleteFileAsset(ctx, userID, fileId) {
+        const assetString = await this.ReadAsset(ctx, fileId);
         let fileAsset;
         try {
             fileAsset = JSON.parse(assetString);
@@ -102,20 +102,20 @@ class fileAssetContract extends Contract {
                 throw new Error(` userID = ${userID} has no permission to delete`);
             }
         } catch (err) {
-            throw new Error(`id = ${id} data can't be processed`);
+            throw new Error(`id = ${fileId} data can't be processed`);
         }
-        return ctx.stub.deleteState(id);
+        return ctx.stub.deleteState(fileId);
     }
 
     // AssetExists returns true when asset with given ID exists in world state.
-    async AssetExists(ctx, id) {
-        const assetJSON = await ctx.stub.getState(id);
+    async AssetExists(ctx, fileId) {
+        const assetJSON = await ctx.stub.getState(fileId);
         return assetJSON && assetJSON.length > 0;
     }
 
     // TransferFileAsset
-    async TransferAsset(ctx, userID, id, newOwnerID) {
-        const assetString = await this.ReadAsset(ctx, id);
+    async TransferAsset(ctx, userID, fileId, newOwnerID) {
+        const assetString = await this.ReadAsset(ctx, fileId);
 
         let dt = new Date().toString();
         let fileAsset;
@@ -131,10 +131,10 @@ class fileAssetContract extends Contract {
             fileAsset.OwnerID = newOwnerID;
             fileAsset.LastUpdated = dt;
         } catch (err) {
-            throw new Error(`id = ${id} data can't be processed`);
+            throw new Error(`id = ${fileId} data can't be processed`);
         }
 
-        return ctx.stub.putState(id, Buffer.from(JSON.stringify(fileAsset)));
+        return ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
     }
 
     // GetAllAssets returns all assets found in the world state.
