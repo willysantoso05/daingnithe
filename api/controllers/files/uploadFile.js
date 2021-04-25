@@ -27,10 +27,10 @@ exports.uploadFile = async (req, res, next) => {
 
     try{
         //generate file id
-        const fileID = uuidv4()
+        const fileID = "FILE_" + uuidv4().toString();
         console.log(fileID);
 
-        const ipfsPath = PATH + fileID.toString() + ".data";
+        const ipfsPath = PATH + fileID + ".data";
     
         //generate keys
         const {publicKey, privateKey} = encryption.generateKeys();
@@ -62,7 +62,7 @@ exports.uploadFile = async (req, res, next) => {
 
         //create file transaction
         try {
-            createFileContract.createFileAsset(walletId, fileID, fileName, ipfsPath, publicKey, shares[0], userId, JSON.stringify("[]"));
+            createFileContract.createFileAsset(walletId, fileID, fileName, ipfsPath, publicKey, shares[0], userId, JSON.stringify([]));
         } catch (err) {
             res.json({status:"error", "error while invoke create file asset": err, data:null});
         }

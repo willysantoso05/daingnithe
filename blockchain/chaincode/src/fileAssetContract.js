@@ -138,7 +138,7 @@ class fileAssetContract extends Contract {
     }
 
     // GetAllAssets returns all assets found in the world state.
-    async GetAllAssets(ctx) {
+    async GetAllFileAssets(ctx) {
         const allResults = [];
         // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
         const iterator = await ctx.stub.getStateByRange('', '');
@@ -152,7 +152,9 @@ class fileAssetContract extends Contract {
                 console.log(err);
                 record = strValue;
             }
-            allResults.push({ Key: result.value.key, Record: record });
+            if (Object.keys(record).length == 9){
+                allResults.push({ Key: result.value.key, Record: record });
+            }
             result = await iterator.next();
         }
         return JSON.stringify(allResults);
