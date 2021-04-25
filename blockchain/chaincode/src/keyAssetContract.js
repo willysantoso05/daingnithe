@@ -34,9 +34,9 @@ class keyAssetContract extends Contract {
             throw new Error(`The asset ${id} does not exist`);
         }
 
-        // Check if user who updates the asset has a permission to update (only owner or granted access)
-        if (assetJSON.OwnerKeyID !== userID && !assetJSON.OwnerFileID !== userID) {
-            throw new Error(` userID = ${userID} has no permission to update`);
+        // Check if user who read the asset has a permission to read (only ownerkey)
+        if (JSON.parse(assetJSON.toString()).OwnerKeyID !== userID && JSON.parse(assetJSON.toString()).OwnerFileID !== userID) {
+            throw new Error(` userID = ${userID} has no permission to read`);
         }
         return assetJSON.toString();
     }
@@ -68,7 +68,7 @@ class keyAssetContract extends Contract {
 
     // DeleteKeyAsset
     async DeleteKeyAsset(ctx, userID, id) {
-        const assetString = await this.ReadAsset(ctx, id);
+        const assetString = await this.ReadKeyAsset(ctx, id);
         let keyAsset;
         try {
             keyAsset = JSON.parse(assetString);
@@ -81,6 +81,29 @@ class keyAssetContract extends Contract {
             throw new Error(`id = ${id} data can't be processed`);
         }
         return ctx.stub.deleteState(id);
+    }
+
+    // GetAllAssets returns all assets found in the world state.
+    async GetAllKeyAssets(ctx) {
+        const allResults = [];
+        // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
+        const iterator = await ctx.stub.getStateByRange('', '');
+        let result = await iterator.next();
+        while (!result.done) {
+            const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
+            let record;
+            try {
+                record = JSON.parse(strValue);
+            } catch (err) {
+                console.log(err);
+                record = strValue;
+            }
+            if (Object.keys(record).length == 7){
+                allResults.push({ Key: result.value.key, Record: record });
+            }
+            result = await iterator.next();
+        }
+        return JSON.stringify(allResults);
     }
 }
 

@@ -23,12 +23,15 @@ exports.uploadFile = async (req, res, next) => {
     const bufferFile = req.files.file.data;
     const userId = req.user._id;
     const walletId = req.user.username;
-    console.log(userId)
 
     try{
         //generate file id
         const fileID = "FILE_" + uuidv4().toString();
-        console.log(fileID);
+        const keyID = "KEY_" + uuidv4().toString();
+
+        let grantedUserList = {};
+        grantedUserList[userId] = keyID;
+        // let grantedUserList = [jsonObj];
 
         const ipfsPath = PATH + fileID + ".data";
     
@@ -62,23 +65,33 @@ exports.uploadFile = async (req, res, next) => {
 
         //create file transaction
         try {
-            createFileContract.createFileAsset(walletId, fileID, fileName, ipfsPath, publicKey, shares[0], userId, JSON.stringify([]));
+            console.log("---CREATE FILE ASSET");
+            createFileContract.createFileAsset(walletId, fileID, fileName, ipfsPath, publicKey, shares[0], userId, JSON.stringify(grantedUserList));
         } catch (err) {
             res.json({status:"error", "error while invoke create file asset": err, data:null});
+            return;
         }
-
-        const keyID = "KEY_" + uuidv4().toString();
 
         //create key transaction
         try {
+            console.log("---CREATE KEY ASSET");
             createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1]);
         } catch (err) {
             res.json({status:"error", "error while invoke create key asset": err, data:null});
+            return;
         }
 
-        res.json({status:"success", message: "uploading to IPFS", data:null});
+        res.json({
+            status:"success",
+            message: "uploading to IPFS",
+            data:{
+                FileID : fileID,
+                OwnerID : userId,
+                GrantedUserList : grantedUserList
+            }
+        });
     } catch (err){
         console.log(err);
-        res.json({status:"error", "error while uploading to IPFS": err, data:null});
+        res.json({status:"error", "error while uploading": err, data:null});
     }
 }

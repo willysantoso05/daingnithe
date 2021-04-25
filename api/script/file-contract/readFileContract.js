@@ -2,7 +2,7 @@ const { Gateway, Wallets } = require('fabric-network');
 const path = require('path');
 const fs = require('fs');
 
-exports.getAllFilesAsset = async(walletID, fileID) => {
+exports.readFileAsset = async(walletID, fileID) => {
     try {
         // load the network configuration
         const ccpPath = path.resolve(__dirname, '..', '..', '..', 'blockchain', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');

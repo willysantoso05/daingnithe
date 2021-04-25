@@ -67,7 +67,7 @@ class fileAssetContract extends Contract {
     }
 
     // UpdateFileAccessAsset for grant or revoke file access 
-    async UpdateFileAccessAsset(ctx, userID, fileId, sharedKey, accessUserList) {
+    async UpdateFileAccessAsset(ctx, userID, fileId, accessUserList) {
         const assetString = await this.ReadFileAsset(ctx, fileId);
 
         let dt = new Date().toString();
@@ -81,7 +81,6 @@ class fileAssetContract extends Contract {
             }
 
             // Update Field
-            fileAsset.SharedKey = sharedKey;
             fileAsset.AccessUserList = accessUserList;
             fileAsset.LastUpdated = dt;
         } catch (err) {
