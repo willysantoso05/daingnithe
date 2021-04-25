@@ -40,7 +40,7 @@ class fileAssetContract extends Contract {
 
     // UpdateFileAsset
     async UpdateFileAsset(ctx, userID, fileId, fileName, ipfsPath, publicKey, sharedKey) {
-        const assetString = await this.ReadAsset(ctx, fileId);
+        const assetString = await this.ReadFileAsset(ctx, fileId);
 
         let dt = new Date().toString();
         let fileAsset;
@@ -62,12 +62,12 @@ class fileAssetContract extends Contract {
             throw new Error(`id = ${fileId} data can't be processed`);
         }
 
-        return ctx.stub.putState(id, Buffer.from(JSON.stringify(fileAsset)));
+        return ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
     }
 
     // UpdateFileAccessAsset for grant or revoke file access 
     async UpdateFileAccessAsset(ctx, userID, fileId, sharedKey, accessUserList) {
-        const assetString = await this.ReadAsset(ctx, fileId);
+        const assetString = await this.ReadFileAsset(ctx, fileId);
 
         let dt = new Date().toString();
         let fileAsset;
@@ -92,7 +92,7 @@ class fileAssetContract extends Contract {
 
     // DeleteFileAsset
     async DeleteFileAsset(ctx, userID, fileId) {
-        const assetString = await this.ReadAsset(ctx, fileId);
+        const assetString = await this.ReadFileAsset(ctx, fileId);
         let fileAsset;
         try {
             fileAsset = JSON.parse(assetString);
@@ -114,8 +114,8 @@ class fileAssetContract extends Contract {
     }
 
     // TransferFileAsset
-    async TransferAsset(ctx, userID, fileId, newOwnerID) {
-        const assetString = await this.ReadAsset(ctx, fileId);
+    async TransferFileAsset(ctx, userID, fileId, newOwnerID) {
+        const assetString = await this.ReadFileAsset(ctx, fileId);
 
         let dt = new Date().toString();
         let fileAsset;

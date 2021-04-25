@@ -28,7 +28,7 @@ class keyAssetContract extends Contract {
     }
 
     // ReadKeyAsset
-    async ReaeKeyAsset(ctx, id) {
+    async ReadKeyAsset(ctx, id) {
         const assetJSON = await ctx.stub.getState(id);
         if (!assetJSON || assetJSON.length === 0) {
             throw new Error(`The asset ${id} does not exist`);
@@ -38,7 +38,7 @@ class keyAssetContract extends Contract {
 
     // UpdateKeyAsset
     async UpdateKeyAsset(ctx, userID, id, keyValue) {
-        const assetString = await this.ReadAsset(ctx, id);
+        const assetString = await this.ReadKeyAsset(ctx, id);
 
         let dt = new Date().toString();
         let keyAsset;
