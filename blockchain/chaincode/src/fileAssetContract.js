@@ -11,9 +11,7 @@ const { Contract } = require('fabric-contract-api');
 class fileAssetContract extends Contract {
 
     // CreateFileAsset
-    async CreateFileAsset(ctx, fileId, fileName, ipfsPath, publicKey, sharedKey, ownerID, accessUserList) {
-        let dt = new Date().toString();
-
+    async CreateFileAsset(ctx, fileId, fileName, ipfsPath, publicKey, sharedKey, ownerID, accessUserList, dt) {
         const fileAsset = {
             ID: fileId,
             FileName: fileName,
@@ -39,10 +37,9 @@ class fileAssetContract extends Contract {
     }
 
     // UpdateFileAsset
-    async UpdateFileAsset(ctx, userID, fileId, fileName, ipfsPath, publicKey, sharedKey) {
+    async UpdateFileAsset(ctx, userID, fileId, fileName, ipfsPath, publicKey, sharedKey, dt) {
         const assetString = await this.ReadFileAsset(ctx, fileId);
 
-        let dt = new Date().toString();
         let fileAsset;
         try {
             fileAsset = JSON.parse(assetString);
@@ -67,10 +64,9 @@ class fileAssetContract extends Contract {
     }
 
     // UpdateFileAccessAsset for grant or revoke file access 
-    async UpdateFileAccessAsset(ctx, userID, fileId, sharedKey, accessUserList) {
+    async UpdateFileAccessAsset(ctx, userID, fileId, sharedKey, accessUserList, dt) {
         const assetString = await this.ReadFileAsset(ctx, fileId);
 
-        let dt = new Date().toString();
         let fileAsset;
         try {
             fileAsset = JSON.parse(assetString);
@@ -111,10 +107,9 @@ class fileAssetContract extends Contract {
     }
 
     // TransferFileAsset
-    async TransferFileAsset(ctx, userID, fileId, newOwnerID) {
+    async TransferFileAsset(ctx, userID, fileId, newOwnerID, dt) {
         const assetString = await this.ReadFileAsset(ctx, fileId);
 
-        let dt = new Date().toString();
         let fileAsset;
         try {
             fileAsset = JSON.parse(assetString);

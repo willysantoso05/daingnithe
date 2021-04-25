@@ -34,7 +34,8 @@ exports.transferFileAsset = async(walletID, userID, fileId, newOwnerID) => {
         // Evaluate the specified transaction.
         // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
         // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-        const result = await contract.submitTransaction('TransferFileAsset', userID, fileId, newOwnerID);
+        let dt = new Date().toString();
+        const result = await contract.submitTransaction('TransferFileAsset', userID, fileId, newOwnerID, dt);
         // console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
         
         // Disconnect from the gateway.

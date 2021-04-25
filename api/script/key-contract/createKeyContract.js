@@ -34,7 +34,8 @@ exports.createKeyAsset = async(walletID, keyId, ownerKeyId, fileId, ownerFileId,
         // Evaluate the specified transaction.
         // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
         // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-        const result = await contract.submitTransaction('CreateKeyAsset', keyId, ownerKeyId, fileId, ownerFileId, keyValue);
+        let dt = new Date().toString();
+        const result = await contract.submitTransaction('CreateKeyAsset', keyId, ownerKeyId, fileId, ownerFileId, keyValue, dt);
         // console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
         
         // Disconnect from the gateway.

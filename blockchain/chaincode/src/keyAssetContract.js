@@ -11,9 +11,7 @@ const { Contract } = require('fabric-contract-api');
 class keyAssetContract extends Contract {
 
     // CreateKeyAsset
-    async CreateKeyAsset(ctx, id, ownerKeyID, fileID, ownerFileID, keyValue) {
-        let dt = new Date().toString();
-
+    async CreateKeyAsset(ctx, id, ownerKeyID, fileID, ownerFileID, keyValue, dt) {
         const keyAsset = {
             ID: id,
             OwnerKeyID: ownerKeyID,
@@ -42,10 +40,9 @@ class keyAssetContract extends Contract {
     }
 
     // UpdateKeyAsset
-    async UpdateKeyAsset(ctx, userID, id, keyValue) {
+    async UpdateKeyAsset(ctx, userID, id, keyValue, dt) {
         const assetString = await this.ReadKeyAsset(ctx, userID, id);
 
-        let dt = new Date().toString();
         let keyAsset;
         try {
             keyAsset = JSON.parse(assetString);
