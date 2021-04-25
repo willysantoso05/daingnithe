@@ -15,8 +15,6 @@ const readKeyContract = require('../../script/key-contract/readKeyContract');
 const createKeyContract = require('../../script/key-contract/createKeyContract');
 const updateKeyContract = require('../../script/key-contract/updateKeyContract');
 const deleteKeyContract = require('../../script/key-contract/deleteKeyContract');
-const { use } = require('../../routes/users');
-const { update } = require('../../models/users');
 
 exports.shareFile = async (req, res, next) => {
     const fileId = req.params.fileId;
@@ -54,6 +52,12 @@ exports.shareFile = async (req, res, next) => {
         const privateKey = sss.combine(shared);
 
         if(action == "GRANT"){
+            //Check if user has already been granted
+            if(accessUserList.hasOwnProperty(targetUserId)){
+                res.json({status:"success", message: "User has already access", data:null});
+                return;
+            }
+
             //Generate new shared
             const secret = Buffer.from(privateKey.toString())
             const newShares = sss.split(secret, { shares: totalGrantedUser+2, threshold: 2 })
@@ -99,6 +103,12 @@ exports.shareFile = async (req, res, next) => {
             }
 
         } else if (action == "REVOKE") {
+            //Check if user has already been granted
+            if(!accessUserList.hasOwnProperty(targetUserId)){
+                res.json({status:"success", message: "User has already no access", data:null});
+                return;
+            }
+
             //Generate new shared
             const secret = Buffer.from(privateKey.toString())
             const newShares = sss.split(secret, { shares: totalGrantedUser, threshold: 2 })
@@ -120,7 +130,7 @@ exports.shareFile = async (req, res, next) => {
             //Delete key transaction
             try {
                 console.log("---DELETE KEY ASSET");
-                deleteKeyContract.deleteKeyAsset(walletId, userId, targetKeyID);
+                await  deleteKeyContract.deleteKeyAsset(walletId, userId, targetKeyID);
             } catch (err) {
                 res.json({status:"error", "error while invoke create key asset": err, data:null});
                 return;
