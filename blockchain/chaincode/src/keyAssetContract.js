@@ -65,7 +65,7 @@ class keyAssetContract extends Contract {
 
     // DeleteKeyAsset
     async DeleteKeyAsset(ctx, userID, id) {
-        const assetString = await this.ReadKeyAsset(ctx, id);
+        const assetString = await this.ReadKeyAsset(ctx, userID, id);
         let keyAsset;
         try {
             keyAsset = JSON.parse(assetString);
