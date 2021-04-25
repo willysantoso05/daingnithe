@@ -66,7 +66,7 @@ exports.uploadFile = async (req, res, next) => {
         //create file transaction
         try {
             console.log("---CREATE FILE ASSET");
-            createFileContract.createFileAsset(walletId, fileID, fileName, ipfsPath, publicKey, shares[0], userId, JSON.stringify(grantedUserList));
+            createFileContract.createFileAsset(walletId, fileID, fileName, ipfsPath, publicKey, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
         } catch (err) {
             res.json({status:"error", "error while invoke create file asset": err, data:null});
             return;
@@ -75,7 +75,7 @@ exports.uploadFile = async (req, res, next) => {
         //create key transaction
         try {
             console.log("---CREATE KEY ASSET");
-            createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1]);
+            createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1].toString('binary'));
         } catch (err) {
             res.json({status:"error", "error while invoke create key asset": err, data:null});
             return;

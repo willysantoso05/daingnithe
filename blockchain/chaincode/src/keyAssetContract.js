@@ -74,7 +74,7 @@ class keyAssetContract extends Contract {
             keyAsset = JSON.parse(assetString);
 
             // Check if user who delete the asset is the owner
-            if (record.OwnerFileID !== userID) {
+            if (keyAssest.OwnerFileID !== userID) {
                 throw new Error(` userID = ${userID} has no permission to delete`);
             }
         } catch (err) {
