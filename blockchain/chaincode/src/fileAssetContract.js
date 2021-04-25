@@ -47,8 +47,8 @@ class fileAssetContract extends Contract {
         try {
             fileAsset = JSON.parse(assetString);
 
-            // Check if user who updates the asset has a permission to update
-            if (fileAsset.OwnerID !== userID && fileAsset.GrantedUserList.includes(userID)) {
+            // Check if user who updates the asset has a permission to update (in granted access)
+            if (!fileAsset.GrantedUserList.includes(userID)) {
                 throw new Error(` userID = ${userID} has no permission to update`);
             }
 
@@ -62,7 +62,8 @@ class fileAssetContract extends Contract {
             throw new Error(`id = ${fileId} data can't be processed`);
         }
 
-        return ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        return JSON.stringify(fileAsset);
     }
 
     // UpdateFileAccessAsset for grant or revoke file access 
@@ -74,7 +75,7 @@ class fileAssetContract extends Contract {
         try {
             fileAsset = JSON.parse(assetString);
 
-            // Check if user who updates the asset has a permission to update
+            // Check if user who share access the asset has a permission to update (owner only)
             if (fileAsset.OwnerID !== userID) {
                 throw new Error(` userID = ${userID} has no permission to update access`);
             }
@@ -87,7 +88,8 @@ class fileAssetContract extends Contract {
             throw new Error(`id = ${fileId} data can't be processed`);
         }
 
-        return ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        return JSON.stringify(fileAsset);
     }
 
     // DeleteFileAsset
@@ -101,16 +103,11 @@ class fileAssetContract extends Contract {
             if (fileAsset.OwnerID !== userID) {
                 throw new Error(` userID = ${userID} has no permission to delete`);
             }
+            
         } catch (err) {
             throw new Error(`id = ${fileId} data can't be processed`);
         }
         return ctx.stub.deleteState(fileId);
-    }
-
-    // AssetExists returns true when asset with given ID exists in world state.
-    async AssetExists(ctx, fileId) {
-        const assetJSON = await ctx.stub.getState(fileId);
-        return assetJSON && assetJSON.length > 0;
     }
 
     // TransferFileAsset
@@ -134,7 +131,8 @@ class fileAssetContract extends Contract {
             throw new Error(`id = ${fileId} data can't be processed`);
         }
 
-        return ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        return JSON.stringify(fileAsset);
     }
 
     // GetAllAssets returns all assets found in the world state.

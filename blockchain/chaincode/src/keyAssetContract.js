@@ -28,17 +28,22 @@ class keyAssetContract extends Contract {
     }
 
     // ReadKeyAsset
-    async ReadKeyAsset(ctx, id) {
+    async ReadKeyAsset(ctx, userID, id) {
         const assetJSON = await ctx.stub.getState(id);
         if (!assetJSON || assetJSON.length === 0) {
             throw new Error(`The asset ${id} does not exist`);
+        }
+
+        // Check if user who updates the asset has a permission to update (only owner or granted access)
+        if (assetJSON.OwnerKeyID !== userID && !assetJSON.OwnerFileID !== userID) {
+            throw new Error(` userID = ${userID} has no permission to update`);
         }
         return assetJSON.toString();
     }
 
     // UpdateKeyAsset
     async UpdateKeyAsset(ctx, userID, id, keyValue) {
-        const assetString = await this.ReadKeyAsset(ctx, id);
+        const assetString = await this.ReadKeyAsset(ctx, userID, id);
 
         let dt = new Date().toString();
         let keyAsset;
@@ -57,7 +62,8 @@ class keyAssetContract extends Contract {
             throw new Error(`id = ${id} data can't be processed`);
         }
 
-        return ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
+        ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
+        return JSON.stringify(keyAsset);
     }
 
     // DeleteKeyAsset
@@ -75,12 +81,6 @@ class keyAssetContract extends Contract {
             throw new Error(`id = ${id} data can't be processed`);
         }
         return ctx.stub.deleteState(id);
-    }
-
-    // AssetExists returns true when asset with given ID exists in world state.
-    async AssetExists(ctx, id) {
-        const assetJSON = await ctx.stub.getState(id);
-        return assetJSON && assetJSON.length > 0;
     }
 }
 
