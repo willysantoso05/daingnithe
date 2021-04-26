@@ -44,9 +44,10 @@ class fileAssetContract extends Contract {
         let fileAsset;
         try {
             fileAsset = JSON.parse(assetString);
+            let accessUserList = JSON.parse(fileAsset.AccessUserList)
 
             // Check if user who updates the asset has a permission to update (in granted access)
-            if (!fileAsset.GrantedUserList.includes(userID)) {
+            if (!accessUserList.hasOwnProperty(userID)) {
                 throw new Error(` userID = ${userID} has no permission to update`);
             }
 
@@ -58,7 +59,7 @@ class fileAssetContract extends Contract {
             fileAsset.SharedKey = sharedKey;
             fileAsset.LastUpdated = dt;
         } catch (err) {
-            throw new Error(`id = ${fileId} data can't be processed`);
+            throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
         }
 
         ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
@@ -125,7 +126,7 @@ class fileAssetContract extends Contract {
             fileAsset.OwnerID = newOwnerID;
             fileAsset.LastUpdated = dt;
         } catch (err) {
-            throw new Error(`id = ${fileId} data can't be processed`);
+            throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
         }
 
         ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
@@ -147,7 +148,7 @@ class fileAssetContract extends Contract {
                 console.log(err);
                 record = strValue;
             }
-            if (Object.keys(record).length == 9){
+            if (Object.keys(record).length == 10){
                 allResults.push({ Key: result.value.key, Record: record });
             }
             result = await iterator.next();

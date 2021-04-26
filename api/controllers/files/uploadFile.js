@@ -18,7 +18,6 @@ const createKeyContract = require('../../script/key-contract/createKeyContract')
 const PATH = "/testing/";
 
 exports.uploadFile = async (req, res, next) => {
-    console.log(req.files.file);
     const fileName = req.files.file.name;
     const mimeType = req.files.file.mimetype;
     const bufferFile = req.files.file.data;
@@ -32,7 +31,6 @@ exports.uploadFile = async (req, res, next) => {
 
         let grantedUserList = {};
         grantedUserList[userId] = keyID;
-        // let grantedUserList = [jsonObj];
 
         const ipfsPath = PATH + fileID + ".data";
     

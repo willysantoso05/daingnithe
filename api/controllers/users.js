@@ -33,12 +33,14 @@ module.exports = {
             if (err) {
                 next(err);
             } else {
-                if(bcrypt.compareSync(req.body.password, userInfo.password)) {
-                    const token = jwt.sign({userId: userInfo._id}, process.env.JWT_SECRET, { expiresIn: '1h' });
-                    res.json({status:"success", message: "user found!!!", data:{id: userInfo._id, username: userInfo.username, token:token}});
-                }else{
-                    res.json({status:"error", message: "Invalid username/password!!!", data:null});
+                if(userInfo) {
+                    if(bcrypt.compareSync(req.body.password, userInfo.password)) {
+                        const token = jwt.sign({userId: userInfo._id}, process.env.JWT_SECRET, { expiresIn: '1h' });
+                        res.json({status:"success", message: "user found!!!", data:{id: userInfo._id, username: userInfo.username, token:token}});
+                        return;
+                    }
                 }
+                res.json({status:"error", message: "Invalid username/password!!!", data:null});
             }
         });
     },

@@ -12,11 +12,11 @@ const sss = require('shamirs-secret-sharing')
 
 const encryption = require('../../utils/encryption');
 const ipfs = require('../../utils/ipfs');
+const readFileContract = require('../../script/file-contract/readFileContract');
 const updateFileContract = require('../../script/file-contract/updateFileContract');
 const updateKeyContract = require('../../script/key-contract/updateKeyContract');
 
 exports.updateFile = async (req, res, next) => {
-    console.log(req.files.file);
     const fileName = req.files.file.name;
     const mimeType = req.files.file.mimetype;
     const bufferFile = req.files.file.data;
@@ -36,7 +36,6 @@ exports.updateFile = async (req, res, next) => {
         const ipfsPath = fileAsset.IpfsPath;
         let accessUserList = JSON.parse(fileAsset.AccessUserList)
         const totalGrantedUser = Object.keys(accessUserList).length;
-        console.log(totalGrantedUser);
 
         //generate keys
         const {publicKey, privateKey} = encryption.generateKeys();
@@ -62,8 +61,8 @@ exports.updateFile = async (req, res, next) => {
 
         //create file transaction
         try {
-            console.log("---UPDATEFILE ASSET");
-            updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'));
+            console.log("---UPDATE FILE ASSET");
+            await updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'));
         } catch (err) {
             res.json({status:"error", "error while invoke update file asset": err, data:null});
             return;
@@ -79,12 +78,21 @@ exports.updateFile = async (req, res, next) => {
 
             //update key transaction
             try {
-                updateKeyContract.updateKeyAsset(walletId, userId, key, shares[i+1].toString('binary'));
+                await updateKeyContract.updateKeyAsset(walletId, userId, key, shares[i+1].toString('binary'));
             } catch (err) {
                 res.json({status:"error", "error while invoke create key asset": err, data:null});
                 return;
             }
         }
+        res.json({
+            status:"success",
+            message: "updating file",
+            data:{
+                FileID : fileId,
+                OwnerID : userId,
+                GrantedUserList : accessUserList
+            }
+        });
 
     } catch (err){
         console.log(err);

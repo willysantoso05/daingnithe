@@ -49,31 +49,30 @@ exports.downloadFile = async (req, res, next) => {
         shared[1] = Buffer.from(keyAsset.KeyValue.toString(), 'binary');
 
         const privateKey = sss.combine(shared);
-        console.log(privateKey.toString());
         
         //Get files from IPFS
         const buffer = await downloadFileIPFS.downloadIPFS(fileAsset.IpfsPath.toString());
 
         //Decrypt file
         const temp_key = encryption.decryptRSA(buffer.slice(0, 684).toString('utf8'), privateKey);
-        const temp_iv = content.slice(684, 700).toString('utf8');
-        const temp_econtent = content.slice(700).toString('utf8');
+        const temp_iv = buffer.slice(684, 700).toString('utf8');
+        const temp_econtent = buffer.slice(700).toString('utf8');
         const temp_ebuf = Buffer.from(temp_econtent, 'hex');
         const temp_content = encryption.decryptAES(temp_ebuf, temp_key, temp_iv);
 
         //Create download
-        var fileContents = Buffer.from(temp_content, "base64");
+        // var fileContents = Buffer.from(temp_content, "base64");
 
         var readStream = new stream.PassThrough();
-        readStream.end(fileContents);
+        readStream.end(temp_content);
 
-        res.set('Content-disposition', 'attachment; filename=' + fileAsset.IpfsPath.toString().replace(PATH, ''));
+        res.set('Content-disposition', 'attachment; filename=' + fileAsset.FileName.toString());
         res.set('Content-Type', fileAsset.MimeType.toString());
 
         readStream.pipe(res);
 
-        res.json({status:"success", message: "Downloading File", data:null});
+        // res.json({status:"success", message: "Downloading File", data:null});
     } catch (err) {
-        res.json({status:"error", "error while invoke create key asset": err, data:null});
+        res.json({status:"error", "error while invoke read file/key asset": err, data:null});
     }
 }

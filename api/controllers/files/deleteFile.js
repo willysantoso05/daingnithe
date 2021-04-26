@@ -42,7 +42,7 @@ exports.deleteFile = async (req, res, next) => {
 
         //Delete File Asset
         try {
-            deleteFileContract.deleteFileAsset(walletId, userId, fileId);
+            await deleteFileContract.deleteFileAsset(walletId, userId, fileId);
         } catch (err) {
             res.json({status:"error", "error while delete file asset": err, data:null});
             return;
@@ -50,6 +50,6 @@ exports.deleteFile = async (req, res, next) => {
 
         res.json({status:"success", message: "File is deleted", data:null});
     } catch (err) {
-        res.json({status:"error", "error while invoke create key asset": err, data:null});
+        res.json({status:"error", "error while invoke delete key asset": err, data:null});
     }
 }

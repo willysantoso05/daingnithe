@@ -34,7 +34,6 @@ exports.shareFile = async (req, res, next) => {
 
         let accessUserList = JSON.parse(fileAsset.AccessUserList)
         const totalGrantedUser = Object.keys(accessUserList).length;
-        console.log(totalGrantedUser);
         const ownerKeyId = accessUserList[userId];
 
         let keyAsset = await readKeyContract.readKeyAsset(walletId, userId, ownerKeyId);
@@ -103,7 +102,7 @@ exports.shareFile = async (req, res, next) => {
             }
 
         } else if (action == "REVOKE") {
-            //Check if user has already been granted
+            //Check if user has already been revoked
             if(!accessUserList.hasOwnProperty(targetUserId)){
                 res.json({status:"success", message: "User has already no access", data:null});
                 return;
@@ -121,7 +120,7 @@ exports.shareFile = async (req, res, next) => {
             //SHARE File Asset
             try {
                 console.log("---SHARE FILE ASSET");
-                shareFileContract.shareFileAsset(walletId, userId, fileId, newShares[0].toString('binary'), JSON.stringify(accessUserList));
+                await shareFileContract.shareFileAsset(walletId, userId, fileId, newShares[0].toString('binary'), JSON.stringify(accessUserList));
             } catch (err) {
                 res.json({status:"error", "error while invoke create file asset": err, data:null});
                 return;
@@ -130,7 +129,7 @@ exports.shareFile = async (req, res, next) => {
             //Delete key transaction
             try {
                 console.log("---DELETE KEY ASSET");
-                await  deleteKeyContract.deleteKeyAsset(walletId, userId, targetKeyID);
+                await deleteKeyContract.deleteKeyAsset(walletId, userId, targetKeyID);
             } catch (err) {
                 res.json({status:"error", "error while invoke create key asset": err, data:null});
                 return;
@@ -157,7 +156,7 @@ exports.shareFile = async (req, res, next) => {
             res.json({status:"error", message: "error action", data:null});
         }
 
-        res.json({status:"success", message: "get all files asset", data:null});
+        res.json({status:"success", message: "Change User Access File", data:null});
     } catch (err) {
         res.json({status:"error", "error while invoke create key asset": err, data:null});
     }
