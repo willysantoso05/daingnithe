@@ -11,10 +11,11 @@ const { Contract } = require('fabric-contract-api');
 class fileAssetContract extends Contract {
 
     // CreateFileAsset
-    async CreateFileAsset(ctx, fileId, fileName, ipfsPath, publicKey, sharedKey, ownerID, accessUserList, dt) {
+    async CreateFileAsset(ctx, fileId, fileName, mimeType, ipfsPath, publicKey, sharedKey, ownerID, accessUserList, dt) {
         const fileAsset = {
             ID: fileId,
             FileName: fileName,
+            MimeType: mimeType,
             IpfsPath: ipfsPath,
             PublicKey: publicKey,
             SharedKey: sharedKey,
@@ -37,7 +38,7 @@ class fileAssetContract extends Contract {
     }
 
     // UpdateFileAsset
-    async UpdateFileAsset(ctx, userID, fileId, fileName, ipfsPath, publicKey, sharedKey, dt) {
+    async UpdateFileAsset(ctx, userID, fileId, fileName, mimeType, ipfsPath, publicKey, sharedKey, dt) {
         const assetString = await this.ReadFileAsset(ctx, fileId);
 
         let fileAsset;
@@ -51,6 +52,7 @@ class fileAssetContract extends Contract {
 
             // Update Field
             fileAsset.FileName = fileName;
+            fileAsset.MimeType = mimeType;
             fileAsset.IpfsPath = ipfsPath;
             fileAsset.PublicKey = publicKey;
             fileAsset.SharedKey = sharedKey;

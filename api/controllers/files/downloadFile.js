@@ -68,7 +68,7 @@ exports.downloadFile = async (req, res, next) => {
         readStream.end(fileContents);
 
         res.set('Content-disposition', 'attachment; filename=' + fileAsset.IpfsPath.toString().replace(PATH, ''));
-        res.set('Content-Type', 'text/plain');
+        res.set('Content-Type', fileAsset.MimeType.toString());
 
         readStream.pipe(res);
 

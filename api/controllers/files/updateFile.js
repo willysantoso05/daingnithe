@@ -18,6 +18,7 @@ const updateKeyContract = require('../../script/key-contract/updateKeyContract')
 exports.updateFile = async (req, res, next) => {
     console.log(req.files.file);
     const fileName = req.files.file.name;
+    const mimeType = req.files.file.mimetype;
     const bufferFile = req.files.file.data;
     const userId = req.user._id;
     const walletId = req.user.username;
@@ -62,7 +63,7 @@ exports.updateFile = async (req, res, next) => {
         //create file transaction
         try {
             console.log("---UPDATEFILE ASSET");
-            updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, ipfsPath, publicKey, shares[0].toString('binary'));
+            updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'));
         } catch (err) {
             res.json({status:"error", "error while invoke update file asset": err, data:null});
             return;

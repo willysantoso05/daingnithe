@@ -20,6 +20,7 @@ const PATH = "/testing/";
 exports.uploadFile = async (req, res, next) => {
     console.log(req.files.file);
     const fileName = req.files.file.name;
+    const mimeType = req.files.file.mimetype;
     const bufferFile = req.files.file.data;
     const userId = req.user._id;
     const walletId = req.user.username;
@@ -60,7 +61,7 @@ exports.uploadFile = async (req, res, next) => {
         //create file transaction
         try {
             console.log("---CREATE FILE ASSET");
-            createFileContract.createFileAsset(walletId, fileID, fileName, ipfsPath, publicKey, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
+            createFileContract.createFileAsset(walletId, fileID, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
         } catch (err) {
             res.json({status:"error", "error while invoke create file asset": err, data:null});
             return;
