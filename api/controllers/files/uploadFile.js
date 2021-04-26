@@ -8,7 +8,7 @@
 
 const {v4 : uuidv4} = require('uuid')
 const crypto = require('crypto');
-const sss = require('shamirs-secret-sharing')
+const sss = require('shamirs-secret-sharing');
 
 const encryption = require('../../utils/encryption');
 const ipfs = require('../../utils/ipfs');
@@ -49,12 +49,6 @@ exports.uploadFile = async (req, res, next) => {
             Buffer.from(iv, 'utf8'),     // char length: 16
             Buffer.from(ebuff, 'utf8')
         ])
-
-        // const temp_key = encryption.decryptRSA(content.slice(0, 684).toString('utf8'), privateKey)
-        // const temp_iv = content.slice(684, 700).toString('utf8')
-        // const temp_econtent = content.slice(700).toString('utf8')
-        // const temp_ebuf = Buffer.from(temp_econtent, 'hex')
-        // const temp_content = encryption.decryptAES(temp_ebuf, temp_key, temp_iv)
 
         //generate shared key
         const secret = Buffer.from(privateKey)

@@ -12,7 +12,7 @@ const shareFileController = require('../controllers/files/shareFile');
 
 router.get('/', getAllFilesController.getAllFiles);
 router.post('/', uploadFileController.uploadFile);
-// router.get('/:fileId', downloadFileController);
+router.get('/:fileId', downloadFileController.downloadFile);
 
 router.put('/:fileId', updateFileController.updateFile);
 router.delete('/:fileId', deleteFileController.deleteFile);
