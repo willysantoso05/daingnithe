@@ -41,6 +41,7 @@ $ mv fabric-samples/bin secure-fs-fabric-ipfs/blockchain/
 
 ```
 $ cd secure-fs-fabric-ipfs/blockchain/test-network
+$ chmod+x *.sh
 $ ./up.sh
 ```
 
