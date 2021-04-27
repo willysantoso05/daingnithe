@@ -24,7 +24,7 @@ class fileAssetContract extends Contract {
             CreateDateTime: dt,
             LastUpdated: dt
         };
-        ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
         return JSON.stringify(fileAsset);
     }
 
@@ -62,7 +62,7 @@ class fileAssetContract extends Contract {
             throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
         }
 
-        ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
         return JSON.stringify(fileAsset);
     }
 
@@ -87,7 +87,7 @@ class fileAssetContract extends Contract {
             throw new Error(`id = ${fileId} data can't be processed`);
         }
 
-        ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
         return JSON.stringify(fileAsset);
     }
 
@@ -106,7 +106,7 @@ class fileAssetContract extends Contract {
         } catch (err) {
             throw new Error(`id = ${fileId} data can't be processed`);
         }
-        return ctx.stub.deleteState(fileId);
+        return await ctx.stub.deleteState(fileId);
     }
 
     // TransferFileAsset
@@ -129,7 +129,7 @@ class fileAssetContract extends Contract {
             throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
         }
 
-        ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+        await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
         return JSON.stringify(fileAsset);
     }
 

@@ -21,7 +21,7 @@ class keyAssetContract extends Contract {
             CreateDateTime: dt,
             LastUpdated: dt
         };
-        ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
+        await ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
         return JSON.stringify(keyAsset);
     }
 
@@ -59,7 +59,7 @@ class keyAssetContract extends Contract {
             throw new Error(`id = ${id} data can't be processed`);
         }
 
-        ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
+        await ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
         return JSON.stringify(keyAsset);
     }
 
@@ -77,7 +77,7 @@ class keyAssetContract extends Contract {
         } catch (err) {
             throw new Error(`id = ${id} data can't be processed`);
         }
-        return ctx.stub.deleteState(id);
+        return await ctx.stub.deleteState(id);
     }
 
     //DEBUG ONLY
