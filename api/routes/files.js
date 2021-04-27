@@ -12,8 +12,8 @@ const historyFileController = require('../controllers/files/historyFile');
 
 router.get('/', getAllFilesController.getAllFiles);
 router.post('/', uploadFileController.uploadFile);
-router.get('/:fileId', downloadFileController.downloadFile);
 
+router.get('/:fileId', downloadFileController.downloadFile);
 router.put('/:fileId', updateFileController.updateFile);
 router.delete('/:fileId', deleteFileController.deleteFile);
 

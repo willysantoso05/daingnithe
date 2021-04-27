@@ -2,7 +2,7 @@
 
 A simple and secured file system with Hyperledger Fabric and IPFS
 
-# How to User
+# How to Use
 
 ## Installation
 
@@ -87,6 +87,27 @@ $ ./initscript.sh
 $ node index.js
 ```
 
-## Author
+# List API
+
+| Route endpoint              | Method | Function                                                      |
+| --------------------------- | ------ | ------------------------------------------------------------- |
+| `/useres/register`          | POST   | Register account and create wallet                            |
+| `/users/sign-in`            | POST   | Sign in and get authorization token                           |
+| `/files/`                   | GET    | Getting all files asset                                       |
+| `/files/`                   | POST   | Upload a file to network                                      |
+| `/files/{FILE ID}`          | GET    | Download file from network with specified id                  |
+| `/files/{FILE ID}`          | PUT    | Update file from network with specified id                    |
+| `/files/{FILE ID}`          | DELETE | Delete file from network with specified id                    |
+| `/files/history/{FILE ID}`  | GET    | Get history of file from network with specified id            |
+| `/files/transfer/{FILE ID}` | PUT    | Change owner of file from network with specified id           |
+| `/files/access/{FILE ID}`   | PUT    | Grant / revoke access of fille from network with specified id |
+
+# Author
 
 13517066 | Willy Santoso
+
+# Reference Repository
+
+- Hyperledger Fabric Development : https://github.com/hyperledger/fabric-samples
+- Encryption with IPFS : https://github.com/healzer/ipfs-file-encryption
+- Secret Sharing : https://github.com/jwerle/shamirs-secret-sharing
