@@ -6,29 +6,24 @@
 
 'use strict';
 
-const crypto = require('crypto');
 const sss = require('shamirs-secret-sharing');
-
 const encryption = require('../../utils/encryption');
-const ipfs = require('../../utils/ipfs');
 
 const readFileContract = require('../../script/file-contract/readFileContract');
 const readKeyContract = require('../../script/key-contract/readKeyContract');
 const downloadFileIPFS = require('../../utils/ipfs');
 
 var stream = require('stream');
-const PATH = "/testing/";
 
 exports.downloadFile = async (req, res, next) => {
     const fileId = req.params.fileId;
-
     const userId = req.user._id;
     const walletId = req.user.username;
 
     try {
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
-            res.json({status:"error", message: "file asset not found", data:null});
+            res.json({status:"ERROR", message: "File asset is not found", data:null});
             return;
         }
         fileAsset = JSON.parse(fileAsset);
@@ -38,7 +33,7 @@ exports.downloadFile = async (req, res, next) => {
 
         let keyAsset = await readKeyContract.readKeyAsset(walletId, userId, ownerKeyId);
         if (!keyAsset) {
-            res.json({status:"error", message: "key asset not found", data:null});
+            res.json({status:"ERROR", message: "Key asset is not found", data:null});
             return;
         }
         keyAsset = JSON.parse(keyAsset);
@@ -61,8 +56,6 @@ exports.downloadFile = async (req, res, next) => {
         const temp_content = encryption.decryptAES(temp_ebuf, temp_key, temp_iv);
 
         //Create download
-        // var fileContents = Buffer.from(temp_content, "base64");
-
         var readStream = new stream.PassThrough();
         readStream.end(temp_content);
 
@@ -73,6 +66,6 @@ exports.downloadFile = async (req, res, next) => {
 
         // res.json({status:"success", message: "Downloading File", data:null});
     } catch (err) {
-        res.json({status:"error", "error while invoke read file/key asset": err, data:null});
+        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
     }
 }

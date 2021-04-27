@@ -59,24 +59,24 @@ exports.uploadFile = async (req, res, next) => {
         //create file transaction
         try {
             console.log("---CREATE FILE ASSET");
-            createFileContract.createFileAsset(walletId, fileID, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
+            await createFileContract.createFileAsset(walletId, fileID, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
         } catch (err) {
-            res.json({status:"error", "error while invoke create file asset": err, data:null});
+            res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
             return;
         }
 
         //create key transaction
         try {
             console.log("---CREATE KEY ASSET");
-            createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1].toString('binary'));
+            await createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1].toString('binary'));
         } catch (err) {
-            res.json({status:"error", "error while invoke create key asset": err, data:null});
+            res.json({status:"ERROR", message: `Error while invoking key asset\n ${err}`, data:null});
             return;
         }
 
         res.json({
-            status:"success",
-            message: "uploading to IPFS",
+            status:"SUCCESS",
+            message: "Uploading file to IPFS",
             data:{
                 FileID : fileID,
                 OwnerID : userId,
@@ -84,7 +84,6 @@ exports.uploadFile = async (req, res, next) => {
             }
         });
     } catch (err){
-        console.log(err);
-        res.json({status:"error", "error while uploading": err, data:null});
+        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
     }
 }

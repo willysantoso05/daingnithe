@@ -11,18 +11,18 @@ const getAllFilesContract = require('../../script/file-contract/getAllFilesContr
 exports.getAllFiles = async (req,res) => {
     const walletId = req.user.username;
     
-    //get all files transaction
     try {
         let result = await getAllFilesContract.getAllFilesAsset(walletId);
 
         if(!result){
-            res.json({status:"success", message: "get all files asset", data:null});
+            res.json({status:"SUCCESS", message: "Get all files asset", data:null});
+            return;
         }
         
         let data = JSON.parse(result);
         
         if (data.length==0) {
-            res.json({status:"success", message: "get all files asset", data:null});
+            res.json({status:"SUCCESS", message: "Get all files asset", data:null});
             return;
         } else {
             let temp = [];
@@ -33,9 +33,9 @@ exports.getAllFiles = async (req,res) => {
                     AccessUserList : JSON.parse(data[i].Record.AccessUserList)
                 }
             }
-            res.json({status:"success", message: "Get All Files Assets", data:temp});
+            res.json({status:"SUCCESS", message: "Get All Files Assets", data:temp});
         }
     } catch (err) {
-        res.json({status:"error", "error while invoke create key asset": err, data:null});
+        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
     }
 };

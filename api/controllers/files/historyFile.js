@@ -6,19 +6,18 @@ exports.historyFile = async (req,res) => {
     const walletId = req.user.username;
     const fileId = req.params.fileId;
     
-    //get all files transaction
     try {
         let result = await historyFileContract.historyFileAsset(walletId, fileId);
 
         if(!result){
-            res.json({status:"success", message: "Get History File Asset", data:null});
+            res.json({status:"SUCCESS", message: "Get history file asset", data:null});
             return;
         }
         
         let data = JSON.parse(result);
         
         if (data.length==0) {
-            res.json({status:"success", message: "Get History File Asset", data:null});
+            res.json({status:"SUCCESS", message: "Get history file asset", data:null});
             return;
         } else {
             let temp = [];
@@ -31,9 +30,9 @@ exports.historyFile = async (req,res) => {
                     AccessUserList : JSON.parse(data[i].Value.AccessUserList)
                 }
             }
-            res.json({status:"success", message: "Get History File Asset", data:temp});
+            res.json({status:"SUCCESS", message: "Get history file asset", data:temp});
         }
     } catch (err) {
-        res.json({status:"error", "error while invoke create key asset": err, data:null});
+        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
     }
 };

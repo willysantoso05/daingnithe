@@ -18,7 +18,7 @@ exports.transferFile = async (req, res, next) => {
         //Check if file id exist
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
-            res.json({status:"error", message: "file asset not found", data:null});
+            res.json({status:"ERROR", message: "File asset is not found", data:null});
             return;
         }
         fileAsset = JSON.parse(fileAsset);
@@ -26,13 +26,13 @@ exports.transferFile = async (req, res, next) => {
 
         //Check if new owner is the last owner
         if( fileAsset.OwnerID == targetUserId ) {
-            res.json({status:"success", message: "User has already been the file owner", data:null});
+            res.json({status:"SUCCESS", message: "User has already been the file owner", data:null});
             return;
         }
 
         //Check if new owner is not in granted user list
         if(accessUserList.hasOwnProperty(targetUserId)){
-            res.json({status:"success", message: "User has already no access", data:null});
+            res.json({status:"SUCCESS", message: "User has already no access", data:null});
             return;
         }
 
@@ -41,13 +41,13 @@ exports.transferFile = async (req, res, next) => {
             console.log("---TRANSFER FILE ASSET");
             await transferFileContract.transferFileAsset(walletId, userId, fileId, targetUserId);
         } catch (err) {
-            res.json({status:"error", "error while invoke transfer file asset": err, data:null});
+            res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
             return;
         }
 
         res.json({
-            status:"success",
-            message: "transfer file",
+            status:"SUCCESS",
+            message: "Transfering file",
             data:{
                 FileID : fileId,
                 OwnerID : targetUserId,
@@ -55,7 +55,6 @@ exports.transferFile = async (req, res, next) => {
         });
 
     } catch (err){
-        console.log(err);
-        res.json({status:"error", "error while uploading": err, data:null});
+        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
     }
 }

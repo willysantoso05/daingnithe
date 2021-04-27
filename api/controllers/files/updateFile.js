@@ -28,7 +28,7 @@ exports.updateFile = async (req, res, next) => {
         //Check if file id exist
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
-            res.json({status:"error", message: "file asset not found", data:null});
+            res.json({status:"ERROR", message: "File asset is not found", data:null});
             return;
         }
         fileAsset = JSON.parse(fileAsset);
@@ -64,7 +64,7 @@ exports.updateFile = async (req, res, next) => {
             console.log("---UPDATE FILE ASSET");
             await updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'));
         } catch (err) {
-            res.json({status:"error", "error while invoke update file asset": err, data:null});
+            res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
             return;
         }
 
@@ -80,7 +80,7 @@ exports.updateFile = async (req, res, next) => {
             try {
                 await updateKeyContract.updateKeyAsset(walletId, userId, key, shares[i+1].toString('binary'));
             } catch (err) {
-                res.json({status:"error", "error while invoke create key asset": err, data:null});
+                res.json({status:"ERROR", message: `Error while invoking key asset\n ${err}`, data:null});
                 return;
             }
         }
@@ -95,7 +95,6 @@ exports.updateFile = async (req, res, next) => {
         });
 
     } catch (err){
-        console.log(err);
-        res.json({status:"error", "error while uploading": err, data:null});
+        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
     }
 }
