@@ -8,7 +8,7 @@ const updateFileController = require('../controllers/files/updateFile');
 const deleteFileController = require('../controllers/files/deleteFile');
 const transferFileController = require('../controllers/files/transferFile');
 const shareFileController = require('../controllers/files/shareFile');
-
+const historyFileController = require('../controllers/files/historyFile');
 
 router.get('/', getAllFilesController.getAllFiles);
 router.post('/', uploadFileController.uploadFile);
@@ -17,6 +17,7 @@ router.get('/:fileId', downloadFileController.downloadFile);
 router.put('/:fileId', updateFileController.updateFile);
 router.delete('/:fileId', deleteFileController.deleteFile);
 
+router.get('/history/:fileId', historyFileController.historyFile);
 router.put('/transfer/:fileId', transferFileController.transferFile);
 router.put('/access/:fileId', shareFileController.shareFile);
 
