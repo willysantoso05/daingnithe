@@ -62,7 +62,7 @@ $ ipfs daemon
 $ cd ../../api
 ```
 
-2. Create .env file from example.env and configure the environment variables
+2. Create `.env` file from `example.env` and configure the environment variables
 
 ```
 $ mv example.env .env
@@ -90,18 +90,18 @@ $ node index.js
 
 # List API
 
-| Route endpoint              | Method | Function                                                      |
-| --------------------------- | ------ | ------------------------------------------------------------- |
-| `/useres/register`          | POST   | Register account and create wallet                            |
-| `/users/sign-in`            | POST   | Sign in and get authorization token                           |
-| `/files/`                   | GET    | Getting all files asset                                       |
-| `/files/`                   | POST   | Upload a file to network                                      |
-| `/files/{FILE ID}`          | GET    | Download file from network with specified id                  |
-| `/files/{FILE ID}`          | PUT    | Update file from network with specified id                    |
-| `/files/{FILE ID}`          | DELETE | Delete file from network with specified id                    |
-| `/files/history/{FILE ID}`  | GET    | Get history of file from network with specified id            |
-| `/files/transfer/{FILE ID}` | PUT    | Change owner of file from network with specified id           |
-| `/files/access/{FILE ID}`   | PUT    | Grant / revoke access of fille from network with specified id |
+| Route endpoint              | Method   | Function                                                     |
+| --------------------------- | -------- | ------------------------------------------------------------ |
+| `/useres/register`          | `POST`   | Register account and create wallet                           |
+| `/users/sign-in`            | `POST`   | Sign in and get authorization token                          |
+| `/files/`                   | `GET`    | Getting all files asset                                      |
+| `/files/`                   | `POST`   | Upload a file to network                                     |
+| `/files/{FILE ID}`          | `GET`    | Download file from network with specified id                 |
+| `/files/{FILE ID}`          | `PUT`    | Update file from network with specified id                   |
+| `/files/{FILE ID}`          | `DELETE` | Delete file from network with specified id                   |
+| `/files/history/{FILE ID}`  | `GET`    | Get history of file from network with specified id           |
+| `/files/transfer/{FILE ID}` | `PUT`    | Change owner of file from network with specified id          |
+| `/files/access/{FILE ID}`   | `PUT`    | Grant / revoke access of file from network with specified id |
 
 # Author
 
