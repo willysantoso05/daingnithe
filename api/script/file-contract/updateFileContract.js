@@ -2,7 +2,7 @@ const { Gateway, Wallets } = require('fabric-network');
 const path = require('path');
 const fs = require('fs');
 
-exports.updateFileAsset = async(walletID, userID, fileId, fileName, mimeType, ipfsPath, publicKey, sharedKey) => {
+exports.updateFileAsset = async(walletID, userID, fileId, fileName, mimeType, ipfsPath, sharedKey) => {
     try {
         // load the network configuration
         const ccpPath = path.resolve(__dirname, '..', '..', '..', 'blockchain', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
@@ -35,7 +35,7 @@ exports.updateFileAsset = async(walletID, userID, fileId, fileName, mimeType, ip
         // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
         // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
         let dt = new Date().toString();
-        const result = await contract.submitTransaction('UpdateFileAsset', userID, fileId, fileName, mimeType, ipfsPath, publicKey, sharedKey, dt);
+        const result = await contract.submitTransaction('UpdateFileAsset', userID, fileId, fileName, mimeType, ipfsPath, sharedKey, dt);
         // console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
         
         // Disconnect from the gateway.

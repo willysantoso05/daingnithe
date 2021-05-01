@@ -59,7 +59,7 @@ exports.uploadFile = async (req, res, next) => {
         //create file transaction
         try {
             console.log("---CREATE FILE ASSET");
-            await createFileContract.createFileAsset(walletId, fileID, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
+            await createFileContract.createFileAsset(walletId, fileID, fileName, mimeType, ipfsPath, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
         } catch (err) {
             res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
             return;

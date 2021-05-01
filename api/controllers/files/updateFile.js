@@ -62,7 +62,7 @@ exports.updateFile = async (req, res, next) => {
         //create file transaction
         try {
             console.log("---UPDATE FILE ASSET");
-            await updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, mimeType, ipfsPath, publicKey, shares[0].toString('binary'));
+            await updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, mimeType, ipfsPath, shares[0].toString('binary'));
         } catch (err) {
             res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
             return;

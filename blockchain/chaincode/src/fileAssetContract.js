@@ -11,13 +11,12 @@ const { Contract } = require('fabric-contract-api');
 class fileAssetContract extends Contract {
 
     // CreateFileAsset
-    async CreateFileAsset(ctx, fileId, fileName, mimeType, ipfsPath, publicKey, sharedKey, ownerID, accessUserList, dt) {
+    async CreateFileAsset(ctx, fileId, fileName, mimeType, ipfsPath, sharedKey, ownerID, accessUserList, dt) {
         const fileAsset = {
             ID: fileId,
             FileName: fileName,
             MimeType: mimeType,
             IpfsPath: ipfsPath,
-            PublicKey: publicKey,
             SharedKey: sharedKey,
             OwnerID: ownerID,
             AccessUserList: accessUserList,
@@ -38,7 +37,7 @@ class fileAssetContract extends Contract {
     }
 
     // UpdateFileAsset
-    async UpdateFileAsset(ctx, userID, fileId, fileName, mimeType, ipfsPath, publicKey, sharedKey, dt) {
+    async UpdateFileAsset(ctx, userID, fileId, fileName, mimeType, ipfsPath, sharedKey, dt) {
         const assetString = await this.ReadFileAsset(ctx, fileId);
 
         let fileAsset;
@@ -55,7 +54,6 @@ class fileAssetContract extends Contract {
             fileAsset.FileName = fileName;
             fileAsset.MimeType = mimeType;
             fileAsset.IpfsPath = ipfsPath;
-            fileAsset.PublicKey = publicKey;
             fileAsset.SharedKey = sharedKey;
             fileAsset.LastUpdated = dt;
         } catch (err) {
@@ -148,7 +146,7 @@ class fileAssetContract extends Contract {
                 console.log(err);
                 record = strValue;
             }
-            if (Object.keys(record).length == 10){
+            if (Object.keys(record).length == 9){
                 allResults.push({ Key: result.value.key, Record: record });
             }
             result = await iterator.next();
@@ -157,7 +155,7 @@ class fileAssetContract extends Contract {
     }
 
     // GetAssetHistory returns the chain of custody for an asset since issuance.
-	async GetAssetHistory(ctx, fileID) {
+	async GetFileAssetHistory(ctx, fileID) {
 
 		let resultsIterator = await ctx.stub.getHistoryForKey(fileID);
 		let results = await this.GetAllResults(resultsIterator, true);
