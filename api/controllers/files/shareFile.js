@@ -157,7 +157,16 @@ exports.shareFile = async (req, res, next) => {
             res.json({status:"ERROR", message: "Error action", data:null});
         }
 
-        res.json({status:"SUCCESS", message: "Change user access file", data:null});
+        res.json({
+            status:"SUCCESS",
+            message: "Change user access file", 
+            data:{
+                Action: `${action} ACCESS`,
+                UserID: targetUserId,
+                FileID : fileId,
+                GrantedUserList : accessUserList
+            }
+        });
     } catch (err) {
         res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
     }
