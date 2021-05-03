@@ -15,6 +15,7 @@ const readKeyContract = require('../../script/key-contract/readKeyContract');
 const createKeyContract = require('../../script/key-contract/createKeyContract');
 const updateKeyContract = require('../../script/key-contract/updateKeyContract');
 const deleteKeyContract = require('../../script/key-contract/deleteKeyContract');
+const wallet = require('../../script/wallet');
 
 exports.shareFile = async (req, res, next) => {
     const fileId = req.params.fileId;
@@ -23,12 +24,16 @@ exports.shareFile = async (req, res, next) => {
 
     const userId = req.user._id;
     const walletId = req.user.username;
+    const walletData = req.wallet;
+
+    await wallet.saveWallet(walletData, walletId);
 
     try {
         //Getting file asset info
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
             res.json({status:"ERROR", message: "File asset is not found", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
         fileAsset = JSON.parse(fileAsset);
@@ -41,6 +46,7 @@ exports.shareFile = async (req, res, next) => {
         let keyAsset = await readKeyContract.readKeyAsset(walletId, userId, ownerKeyId);
         if (!keyAsset) {
             res.json({status:"ERROR", message: "Key asset is not found", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
         keyAsset = JSON.parse(keyAsset);
@@ -56,6 +62,7 @@ exports.shareFile = async (req, res, next) => {
             //Check if user has already been granted
             if(accessUserList.hasOwnProperty(targetUserId)){
                 res.json({status:"SUCCESS", message: "User has already access", data:null});
+                wallet.deleteWallet(walletId);
                 return;
             }
 
@@ -72,7 +79,8 @@ exports.shareFile = async (req, res, next) => {
                 console.log("---SHARE FILE ASSET");
                 await shareFileContract.shareFileAsset(walletId, userId, fileId, newShares[0].toString('binary'), JSON.stringify(accessUserList));
             } catch (err) {
-                res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+                res.json({status:"ERROR", message: err, data:null});
+                wallet.deleteWallet(walletId);
                 return;
             }
 
@@ -81,7 +89,8 @@ exports.shareFile = async (req, res, next) => {
                 console.log("---CREATE KEY ASSET");
                 await createKeyContract.createKeyAsset(walletId, keyID, targetUserId, fileId, userId, newShares[1].toString('binary'));
             } catch (err) {
-                res.json({status:"ERROR", message: `Error while invoking key asset\n ${err}`, data:null});
+                res.json({status:"ERROR", message: err, data:null});
+                wallet.deleteWallet(walletId);
                 return;
             }
 
@@ -97,7 +106,8 @@ exports.shareFile = async (req, res, next) => {
                 try {
                     await updateKeyContract.updateKeyAsset(walletId, userId, key, newShares[i+2].toString('binary'));
                 } catch (err) {
-                    res.json({status:"ERROR", message: `Error while invoking key asset\n ${err}`, data:null});
+                    res.json({status:"ERROR", message: err, data:null});
+                    wallet.deleteWallet(walletId);
                     return;
                 }
             }
@@ -106,6 +116,7 @@ exports.shareFile = async (req, res, next) => {
             //Check if user has already been revoked
             if(!accessUserList.hasOwnProperty(targetUserId)){
                 res.json({status:"SUCCESS", message: "User has already no access", data:null});
+                wallet.deleteWallet(walletId);
                 return;
             }
 
@@ -123,7 +134,8 @@ exports.shareFile = async (req, res, next) => {
                 console.log("---SHARE FILE ASSET");
                 await shareFileContract.shareFileAsset(walletId, userId, fileId, newShares[0].toString('binary'), JSON.stringify(accessUserList));
             } catch (err) {
-                res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+                res.json({status:"ERROR", message: err, data:null});
+                wallet.deleteWallet(walletId);
                 return;
             }
 
@@ -132,7 +144,8 @@ exports.shareFile = async (req, res, next) => {
                 console.log("---DELETE KEY ASSET");
                 await deleteKeyContract.deleteKeyAsset(walletId, userId, targetKeyID);
             } catch (err) {
-                res.json({status:"ERROR", message: `Error while invoking key asset\n ${err}`, data:null});
+                res.json({status:"ERROR", message: err, data:null});
+                wallet.deleteWallet(walletId);
                 return;
             }
 
@@ -148,11 +161,11 @@ exports.shareFile = async (req, res, next) => {
                 try {
                     await updateKeyContract.updateKeyAsset(walletId, userId, key, newShares[i+1].toString('binary'));
                 } catch (err) {
-                    res.json({status:"ERROR", message: `Error while invoking key asset\n ${err}`, data:null});
+                    res.json({status:"ERROR", message: err, data:null});
+                    wallet.deleteWallet(walletId);
                     return;
                 }
             }
-
         } else {
             res.json({status:"ERROR", message: "Error action", data:null});
         }
@@ -168,6 +181,7 @@ exports.shareFile = async (req, res, next) => {
             }
         });
     } catch (err) {
-        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+        res.json({status:"ERROR", message: err, data:null});
     }
+    wallet.deleteWallet(walletId);
 }

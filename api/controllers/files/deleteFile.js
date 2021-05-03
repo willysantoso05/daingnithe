@@ -9,16 +9,21 @@
 const readFileContract = require('../../script/file-contract/readFileContract');
 const deleteFileContract = require('../../script/file-contract/deleteFileContract');
 const deleteKeyContract = require('../../script/key-contract/deleteKeyContract');
+const wallet = require('../../script/wallet');
 
 exports.deleteFile = async (req, res, next) => {
     const fileId = req.params.fileId;
     const userId = req.user._id;
     const walletId = req.user.username;
+    const walletData = req.wallet;
+
+    await wallet.saveWallet(walletData, walletId);
 
     try {
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
             res.json({status:"ERROR", message: "File asset is not found", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
         fileAsset = JSON.parse(fileAsset);
@@ -35,7 +40,8 @@ exports.deleteFile = async (req, res, next) => {
             try {
                 await deleteKeyContract.deleteKeyAsset(walletId, userId, key.toString());
             } catch (err) {
-                res.json({status:"ERROR", message: `Error while deleting key assets\n ${err}`, data:null});
+                res.json({status:"ERROR", message: err, data:null});
+                wallet.deleteWallet(walletId);
                 return;
             }
         }
@@ -44,7 +50,8 @@ exports.deleteFile = async (req, res, next) => {
         try {
             await deleteFileContract.deleteFileAsset(walletId, userId, fileId);
         } catch (err) {
-            res.json({status:"ERROR", message: `Error while deleting file asset\n ${err}`, data:null});
+            res.json({status:"ERROR", message: err, data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
 
@@ -52,6 +59,7 @@ exports.deleteFile = async (req, res, next) => {
             "File ID": fileId
         }});
     } catch (err) {
-        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+        res.json({status:"ERROR", message: err, data:null});
     }
+    wallet.deleteWallet(walletId);
 }

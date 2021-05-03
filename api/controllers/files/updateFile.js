@@ -15,6 +15,7 @@ const ipfs = require('../../utils/ipfs');
 const readFileContract = require('../../script/file-contract/readFileContract');
 const updateFileContract = require('../../script/file-contract/updateFileContract');
 const updateKeyContract = require('../../script/key-contract/updateKeyContract');
+const wallet = require('../../script/wallet');
 
 exports.updateFile = async (req, res, next) => {
     const fileName = req.files.file.name;
@@ -23,12 +24,16 @@ exports.updateFile = async (req, res, next) => {
     const userId = req.user._id;
     const walletId = req.user.username;
     const fileId = req.params.fileId;
+    const walletData = req.wallet;
+
+    await wallet.saveWallet(walletData, walletId);
 
     try {
         //Check if file id exist
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
             res.json({status:"ERROR", message: "File asset is not found", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
         fileAsset = JSON.parse(fileAsset);
@@ -64,7 +69,8 @@ exports.updateFile = async (req, res, next) => {
             console.log("---UPDATE FILE ASSET");
             await updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, mimeType, ipfsPath, shares[0].toString('binary'));
         } catch (err) {
-            res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+            res.json({status:"ERROR", message: err, data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
 
@@ -80,7 +86,8 @@ exports.updateFile = async (req, res, next) => {
             try {
                 await updateKeyContract.updateKeyAsset(walletId, userId, key, shares[i+1].toString('binary'));
             } catch (err) {
-                res.json({status:"ERROR", message: `Error while invoking key asset\n ${err}`, data:null});
+                res.json({status:"ERROR", message: err, data:null});
+                wallet.deleteWallet(walletId);
                 return;
             }
         }
@@ -95,6 +102,7 @@ exports.updateFile = async (req, res, next) => {
         });
 
     } catch (err){
-        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+        res.json({status:"ERROR", message: err, data:null});
     }
+    wallet.deleteWallet(walletId);
 }

@@ -12,6 +12,7 @@ const encryption = require('../../utils/encryption');
 const readFileContract = require('../../script/file-contract/readFileContract');
 const readKeyContract = require('../../script/key-contract/readKeyContract');
 const downloadFileIPFS = require('../../utils/ipfs');
+const wallet = require('../../script/wallet');
 
 var stream = require('stream');
 
@@ -19,11 +20,15 @@ exports.downloadFile = async (req, res, next) => {
     const fileId = req.params.fileId;
     const userId = req.user._id;
     const walletId = req.user.username;
+    const walletData = req.wallet;
+
+    await wallet.saveWallet(walletData, walletId);
 
     try {
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
             res.json({status:"ERROR", message: "File asset is not found", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
         fileAsset = JSON.parse(fileAsset);
@@ -34,6 +39,7 @@ exports.downloadFile = async (req, res, next) => {
         let keyAsset = await readKeyContract.readKeyAsset(walletId, userId, ownerKeyId);
         if (!keyAsset) {
             res.json({status:"ERROR", message: "Key asset is not found", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
         keyAsset = JSON.parse(keyAsset);
@@ -66,6 +72,7 @@ exports.downloadFile = async (req, res, next) => {
 
         // res.json({status:"success", message: "Downloading File", data:null});
     } catch (err) {
-        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+        res.json({status:"ERROR", message: err, data:null});
     }
+    wallet.deleteWallet(walletId);
 }

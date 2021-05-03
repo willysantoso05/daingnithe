@@ -7,18 +7,23 @@
 'use strict';
 const readFileContract = require('../../script/file-contract/readFileContract');
 const transferFileContract = require('../../script/file-contract/transferFileContract');
+const wallet = require('../../script/wallet');
 
 exports.transferFile = async (req, res, next) => {
     const targetUserId = req.body.userId;
     const userId = req.user._id;
     const walletId = req.user.username;
     const fileId = req.params.fileId;
+    const walletData = req.wallet;
+
+    await wallet.saveWallet(walletData, walletId);
 
     try {
         //Check if file id exist
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
             res.json({status:"ERROR", message: "File asset is not found", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
         fileAsset = JSON.parse(fileAsset);
@@ -27,12 +32,14 @@ exports.transferFile = async (req, res, next) => {
         //Check if new owner is the last owner
         if( fileAsset.OwnerID == targetUserId ) {
             res.json({status:"SUCCESS", message: "User has already been the file owner", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
 
         //Check if new owner is not in granted user list
         if(accessUserList.hasOwnProperty(targetUserId)){
             res.json({status:"SUCCESS", message: "User has already no access", data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
 
@@ -41,7 +48,8 @@ exports.transferFile = async (req, res, next) => {
             console.log("---TRANSFER FILE ASSET");
             await transferFileContract.transferFileAsset(walletId, userId, fileId, targetUserId);
         } catch (err) {
-            res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+            res.json({status:"ERROR", message: err, data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
 
@@ -53,8 +61,8 @@ exports.transferFile = async (req, res, next) => {
                 OwnerID : targetUserId,
             }
         });
-
     } catch (err){
-        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+        res.json({status:"ERROR", message: err, data:null});
     }
+    wallet.deleteWallet(walletId);
 }

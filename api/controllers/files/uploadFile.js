@@ -14,6 +14,7 @@ const encryption = require('../../utils/encryption');
 const ipfs = require('../../utils/ipfs');
 const createFileContract = require('../../script/file-contract/createFileContract');
 const createKeyContract = require('../../script/key-contract/createKeyContract');
+const wallet = require('../../script/wallet');
 
 const PATH = "/testing/";
 
@@ -23,6 +24,9 @@ exports.uploadFile = async (req, res, next) => {
     const bufferFile = req.files.file.data;
     const userId = req.user._id;
     const walletId = req.user.username;
+    const walletData = req.wallet;
+
+    await wallet.saveWallet(walletData, walletId);
 
     try{
         //generate file id
@@ -61,7 +65,8 @@ exports.uploadFile = async (req, res, next) => {
             console.log("---CREATE FILE ASSET");
             await createFileContract.createFileAsset(walletId, fileID, fileName, mimeType, ipfsPath, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
         } catch (err) {
-            res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+            res.json({status:"ERROR", message: err, data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
 
@@ -70,7 +75,8 @@ exports.uploadFile = async (req, res, next) => {
             console.log("---CREATE KEY ASSET");
             await createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1].toString('binary'));
         } catch (err) {
-            res.json({status:"ERROR", message: `Error while invoking key asset\n ${err}`, data:null});
+            res.json({status:"ERROR", message: err, data:null});
+            wallet.deleteWallet(walletId);
             return;
         }
 
@@ -84,6 +90,7 @@ exports.uploadFile = async (req, res, next) => {
             }
         });
     } catch (err){
-        res.json({status:"ERROR", message: `Error while invoking file asset\n ${err}`, data:null});
+        res.json({status:"ERROR", message: err, data:null});
     }
+    wallet.deleteWallet(walletId);
 }
