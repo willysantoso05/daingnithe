@@ -15,6 +15,7 @@ exports.auth = async (req, res, next) => {
         
         //put user in req object; so the controller can access current user
         req.user = user;
+        req.wallet = decodedToken.wallet;
         next();
     } catch {
         return res.status(401).json({
