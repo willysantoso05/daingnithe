@@ -18,7 +18,7 @@ exports.updateKeyAsset = async(walletID, userID, keyId, keyValue) => {
         if (!identity) {
             console.log(`An identity for the user ${walletID} does not exist in the wallet`);
             console.log('Run the registerUser.js application before retrying');
-            return;
+            throw (`An identity for the user ${walletID} does not exist in the wallet`);
         }
 
         // Create a new gateway for connecting to our peer node.

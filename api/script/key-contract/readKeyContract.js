@@ -18,7 +18,7 @@ exports.readKeyAsset = async(walletID, userID, id) => {
         if (!identity) {
             console.log(`An identity for the user ${walletID} does not exist in the wallet`);
             console.log('Run the registerUser.js application before retrying');
-            return;
+            throw (`An identity for the user ${walletID} does not exist in the wallet`);
         }
 
         // Create a new gateway for connecting to our peer node.
@@ -34,12 +34,17 @@ exports.readKeyAsset = async(walletID, userID, id) => {
         // Evaluate the specified transaction.
         // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
         // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-        const result = await contract.evaluateTransaction('ReadKeyAsset', userID, id);
+        var result = await contract.evaluateTransaction('ReadKeyAsset', userID, id);
         // console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
         
         // Disconnect from the gateway.
         await gateway.disconnect();
-        return result.toString();
+        try{
+            result = result.toString();
+            return result;
+        } catch (err) {
+            throw('Key Asset not found');
+        }
 
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);

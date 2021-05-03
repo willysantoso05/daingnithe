@@ -34,12 +34,17 @@ exports.getAllFilesAsset = async(walletID) => {
         // Evaluate the specified transaction.
         // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
         // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-        const result = await contract.evaluateTransaction('GetAllFileAssets');
+        var result = await contract.evaluateTransaction('GetAllFileAssets');
         // console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
         
         // Disconnect from the gateway.
         await gateway.disconnect();
-        return result.toString();
+        try{
+            result = result.toString();
+            return result;
+        } catch (err) {
+            throw('File Asset not found');
+        }
 
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
