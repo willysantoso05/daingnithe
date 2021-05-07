@@ -29,106 +29,128 @@ class fileAssetContract extends Contract {
 
     // ReadFileAsset
     async ReadFileAsset(ctx, fileId) {
-        const assetJSON = await ctx.stub.getState(fileId);
+        let assetJSON = await ctx.stub.getState(fileId);
         if (!assetJSON || assetJSON.length === 0) {
             throw new Error(`The asset ${fileId} does not exist`);
         }
-        return assetJSON.toString();
+
+        try{
+            assetJSON = assetJSON.toString();
+            return assetJSON;
+        } catch (err) {
+            throw new Error(`The asset ${fileId} does not exist`);
+        }
     }
 
     // UpdateFileAsset
     async UpdateFileAsset(ctx, userID, fileId, fileName, mimeType, ipfsPath, sharedKey, dt) {
-        const assetString = await this.ReadFileAsset(ctx, fileId);
-
-        let fileAsset;
         try {
-            fileAsset = JSON.parse(assetString);
-            let accessUserList = JSON.parse(fileAsset.AccessUserList)
-
-            // Check if user who updates the asset has a permission to update (in granted access)
-            if (!accessUserList.hasOwnProperty(userID)) {
-                throw new Error(` userID = ${userID} has no permission to update`);
+            const assetString = await this.ReadFileAsset(ctx, fileId);
+    
+            let fileAsset;
+            try {
+                fileAsset = JSON.parse(assetString);
+                let accessUserList = JSON.parse(fileAsset.AccessUserList)
+    
+                // Check if user who updates the asset has a permission to update (in granted access)
+                if (!accessUserList.hasOwnProperty(userID)) {
+                    throw new Error(` userID = ${userID} has no permission to update`);
+                }
+    
+                // Update Field
+                fileAsset.FileName = fileName;
+                fileAsset.MimeType = mimeType;
+                fileAsset.IpfsPath = ipfsPath;
+                fileAsset.SharedKey = sharedKey;
+                fileAsset.LastUpdated = dt;
+            } catch (err) {
+                throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
             }
-
-            // Update Field
-            fileAsset.FileName = fileName;
-            fileAsset.MimeType = mimeType;
-            fileAsset.IpfsPath = ipfsPath;
-            fileAsset.SharedKey = sharedKey;
-            fileAsset.LastUpdated = dt;
+    
+            await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+            return JSON.stringify(fileAsset);
         } catch (err) {
-            throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
+            throw new Error(`The asset ${fileId} does not exist`);
         }
-
-        await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
-        return JSON.stringify(fileAsset);
     }
 
     // UpdateFileAccessAsset for grant or revoke file access 
     async UpdateFileAccessAsset(ctx, userID, fileId, sharedKey, accessUserList, dt) {
-        const assetString = await this.ReadFileAsset(ctx, fileId);
-
-        let fileAsset;
         try {
-            fileAsset = JSON.parse(assetString);
+            const assetString = await this.ReadFileAsset(ctx, fileId);
 
-            // Check if user who share access the asset has a permission to update (owner only)
-            if (fileAsset.OwnerID !== userID) {
-                throw new Error(` userID = ${userID} has no permission to update access`);
+            let fileAsset;
+            try {
+                fileAsset = JSON.parse(assetString);
+
+                // Check if user who share access the asset has a permission to update (owner only)
+                if (fileAsset.OwnerID !== userID) {
+                    throw new Error(` userID = ${userID} has no permission to update access`);
+                }
+
+                // Update Field
+                fileAsset.SharedKey = sharedKey;
+                fileAsset.AccessUserList = accessUserList;
+                fileAsset.LastUpdated = dt;
+            } catch (err) {
+                throw new Error(`id = ${fileId} data can't be processed`);
             }
 
-            // Update Field
-            fileAsset.SharedKey = sharedKey;
-            fileAsset.AccessUserList = accessUserList;
-            fileAsset.LastUpdated = dt;
+            await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+            return JSON.stringify(fileAsset);
         } catch (err) {
-            throw new Error(`id = ${fileId} data can't be processed`);
+            throw new Error(`The asset ${fileId} does not exist`);
         }
-
-        await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
-        return JSON.stringify(fileAsset);
     }
 
     // DeleteFileAsset
     async DeleteFileAsset(ctx, userID, fileId) {
-        const assetString = await this.ReadFileAsset(ctx, fileId);
-        let fileAsset;
-        try {
-            fileAsset = JSON.parse(assetString);
+        try{
+            const assetString = await this.ReadFileAsset(ctx, fileId);
+            let fileAsset;
+            try {
+                fileAsset = JSON.parse(assetString);
 
-            // Check if user who delete the asset is the owner
-            if (fileAsset.OwnerID !== userID) {
-                throw new Error(` userID = ${userID} has no permission to delete`);
+                // Check if user who delete the asset is the owner
+                if (fileAsset.OwnerID !== userID) {
+                    throw new Error(` userID = ${userID} has no permission to delete`);
+                }
+                
+            } catch (err) {
+                throw new Error(`id = ${fileId} data can't be processed`);
             }
-            
+            return await ctx.stub.deleteState(fileId);
         } catch (err) {
-            throw new Error(`id = ${fileId} data can't be processed`);
+            throw new Error(`The asset ${fileId} does not exist`);
         }
-        return await ctx.stub.deleteState(fileId);
     }
 
     // TransferFileAsset
     async TransferFileAsset(ctx, userID, fileId, newOwnerID, dt) {
-        const assetString = await this.ReadFileAsset(ctx, fileId);
+        try{
+            const assetString = await this.ReadFileAsset(ctx, fileId);
 
-        let fileAsset;
-        try {
-            fileAsset = JSON.parse(assetString);
+            let fileAsset;
+            try {
+                fileAsset = JSON.parse(assetString);
 
-            // Check if user who transfers the asset is the owner
-            if (fileAsset.OwnerID !== userID) {
-                throw new Error(` userID = ${userID} has no permission to transfer`);
+                // Check if user who transfers the asset is the owner
+                if (fileAsset.OwnerID !== userID) {
+                    throw new Error(` userID = ${userID} has no permission to transfer`);
+                }
+
+                // Update Owner Field
+                fileAsset.OwnerID = newOwnerID;
+                fileAsset.LastUpdated = dt;
+            } catch (err) {
+                throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
             }
 
-            // Update Owner Field
-            fileAsset.OwnerID = newOwnerID;
-            fileAsset.LastUpdated = dt;
+            await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
+            return JSON.stringify(fileAsset);
         } catch (err) {
-            throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
+            throw new Error(`The asset ${fileId} does not exist`);
         }
-
-        await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
-        return JSON.stringify(fileAsset);
     }
 
     // GetAllAssets returns all assets found in the world state.

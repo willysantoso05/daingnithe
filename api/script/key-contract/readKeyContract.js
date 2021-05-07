@@ -48,6 +48,6 @@ exports.readKeyAsset = async(walletID, userID, id) => {
 
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
-        throw (error);
+        throw('Key Asset not found');
     }
 }

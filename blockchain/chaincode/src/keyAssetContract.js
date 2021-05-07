@@ -27,40 +27,50 @@ class keyAssetContract extends Contract {
 
     // ReadKeyAsset
     async ReadKeyAsset(ctx, userID, id) {
-        const assetJSON = await ctx.stub.getState(id);
+        let assetJSON = await ctx.stub.getState(id);
         if (!assetJSON || assetJSON.length === 0) {
             throw new Error(`The asset ${id} does not exist`);
         }
 
-        // Check if user who read the asset has a permission to read (only ownerkey)
-        if (JSON.parse(assetJSON.toString()).OwnerKeyID !== userID && JSON.parse(assetJSON.toString()).OwnerFileID !== userID) {
-            throw new Error(` userID = ${userID} has no permission to read`);
+        try{
+            assetJSON = assetJSON.toString();
+            // Check if user who read the asset has a permission to read (only ownerkey)
+            if (JSON.parse(assetJSON).OwnerKeyID !== userID && JSON.parse(assetJSON).OwnerFileID !== userID) {
+                throw new Error(` userID = ${userID} has no permission to read`);
+            }
+            return assetJSON;
+        } catch (err) {
+            throw new Error(`The asset ${id} does not exist`);
         }
-        return assetJSON.toString();
     }
 
     // UpdateKeyAsset
     async UpdateKeyAsset(ctx, userID, id, keyValue, dt) {
-        const assetString = await this.ReadKeyAsset(ctx, userID, id);
-
-        let keyAsset;
-        try {
-            keyAsset = JSON.parse(assetString);
-
-            // Check if user who updates the asset has a permission to update
-            if (keyAsset.OwnerFileID !== userID) {
-                throw new Error(` userID = ${userID} has no permission to update`);
+        try{
+            const assetString = await this.ReadKeyAsset(ctx, userID, id);
+    
+            let keyAsset;
+            try {
+                keyAsset = JSON.parse(assetString);
+    
+                // Check if user who updates the asset has a permission to update
+                if (keyAsset.OwnerFileID !== userID) {
+                    throw new Error(` userID = ${userID} has no permission to update`);
+                }
+    
+                // Update KeyValue Field
+                keyAsset.KeyValue = keyValue;
+                keyAsset.LastUpdated = dt;
+            } catch (err) {
+                throw new Error(`id = ${id} data can't be processed`);
             }
+    
+            await ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
+            return JSON.stringify(keyAsset);
 
-            // Update KeyValue Field
-            keyAsset.KeyValue = keyValue;
-            keyAsset.LastUpdated = dt;
         } catch (err) {
-            throw new Error(`id = ${id} data can't be processed`);
+            throw new Error(`The asset ${id} does not exist`);
         }
-
-        await ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
-        return JSON.stringify(keyAsset);
     }
 
     // DeleteKeyAsset

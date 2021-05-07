@@ -48,6 +48,6 @@ exports.getAllFilesAsset = async(walletID) => {
 
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
-        throw (error);
+        throw('File Asset not found');
     }
 }

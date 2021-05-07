@@ -48,6 +48,6 @@ exports.readFileAsset = async(walletID, fileID) => {
 
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
-        throw (error);
+        throw('File Asset not found');
     }
 }

@@ -16,7 +16,7 @@ const createFileContract = require('../../script/file-contract/createFileContrac
 const createKeyContract = require('../../script/key-contract/createKeyContract');
 const wallet = require('../../script/wallet');
 
-const PATH = "/testing/";
+const PATH = "/fabric-ipfs/";
 
 exports.uploadFile = async (req, res, next) => {
     const fileName = req.files.file.name;
