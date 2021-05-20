@@ -2,11 +2,9 @@ const userModel = require('../models/users');
 const bcrypt = require('bcrypt'); 
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const fs = require('fs');
 
 const wallet = require('../script/wallet');
 const enrollWalletUser = require('../script/enrollUser');
-const { fileURLToPath } = require('url');
 
 exports.create = (req, res, next) => {
     try{
@@ -15,6 +13,7 @@ exports.create = (req, res, next) => {
         password = req.body.password.trim();
     } catch {
         res.json({status:"ERROR", message: "Invalid Request Body", data:null});
+        return;
     }
 
     userModel.findOne({username:userName}, async function(err, userInfo){

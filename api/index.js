@@ -1,6 +1,7 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const logger = require('morgan');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const mongoose = require('./config/database');
 const users = require('./routes/users');
@@ -13,6 +14,7 @@ const app = express();
 mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
 app.use(logger('dev'));
 app.use(fileUpload());
+app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/', function(req, res){
