@@ -26,32 +26,26 @@ export default {
   },
 
   methods: {
-    submit() {
+    async submit() {
+      var querystring = require('querystring');
+
       const data = {
         name: this.name,
         username: this.username,
         password: this.password
       }
-      console.log(data);
-
-      var querystring = require('querystring');
+      
       const headers = { 
         "Content-Type": "application/x-www-form-urlencoded"
       }
-      
-      axios.post('http://localhost:3000/users/register', querystring.stringify(data),{
-        headers: headers,
-        responseType: 'blob'
-        }).then(
-            res => {
-              download(res.data, "Wallet.id")
-              console.log(res)
-            } 
-          ).catch(
-            err => {
-              console.log(err)
-            }
-          )
+
+      const response = await axios.post('users/register', querystring.stringify(data),{
+                                headers: headers,
+                                responseType: 'blob'
+                              });
+      download(response.data, "Wallet.id")
+
+      this.$router.push('/login').catch(()=>{});
     }
   }
 }

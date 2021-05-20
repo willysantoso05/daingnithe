@@ -1,6 +1,6 @@
 <template>
 <div>
-  <Nav />
+  <Nav/>
   <main class="form-signin">
     <router-view/>
   </main>
@@ -11,7 +11,14 @@
 import Nav from '@/components/Nav'
 
 export default{
-  components: {Nav}
+  components: {
+    Nav
+  },
+
+  created() {
+    this.$store.dispatch('userID', localStorage.getItem("userID"));
+    this.$store.dispatch('username', localStorage.getItem("username"));
+  }
 }
 </script>
 

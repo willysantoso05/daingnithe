@@ -12,14 +12,14 @@ exports.create = (req, res, next) => {
         userName = req.body.username.trim();
         password = req.body.password.trim();
     } catch {
-        res.json({status:"ERROR", message: "Invalid Request Body", data:null});
+        res.status(400).json({status:"ERROR", message: "Invalid Request Body", data:null});
         return;
     }
 
     userModel.findOne({username:userName}, async function(err, userInfo){
         if (userInfo) {
             console.log(userInfo.username);
-            res.json({status:"ERROR", message: "Username has already been used", data:null});
+            res.status(400).json({status:"ERROR", message: "Username has already been used", data:null});
             return;
         } 
         
@@ -35,7 +35,7 @@ exports.create = (req, res, next) => {
                     res.download(filePath, `${userName}.id`, function (err) {
                         if (err) {
                             console.log(err);
-                            res.json({status:"ERROR", message: "Downloading Wallet Failed", data:null});
+                            res.status(400).json({status:"ERROR", message: "Downloading Wallet Failed", data:null});
                         }
                         wallet.deleteWallet(userName);
                     });
@@ -43,7 +43,7 @@ exports.create = (req, res, next) => {
                 }
             });
         } else {
-            res.json({status:"ERROR", message: "Creating wallet error", data:null});
+            res.status(400).json({status:"ERROR", message: "Creating wallet error", data:null});
         }
     });
 }
@@ -52,7 +52,7 @@ exports.authenticate = (req, res, next) => {
     try{
         walletData = req.files.wallet.data.toString('utf8');
     }catch{
-        res.json({status:"ERROR", message: "Invalid Wallet", data:null});
+        res.status(400).json({status:"ERROR", message: "Invalid Wallet", data:null});
         return;
     }
 
@@ -67,7 +67,7 @@ exports.authenticate = (req, res, next) => {
                     return;
                 }
             }
-            res.json({status:"ERROR", message: "Invalid username/password!!!", data:null});
+            res.status(400).json({status:"ERROR", message: "Invalid username/password!!!", data:null});
         }
     });
 }
