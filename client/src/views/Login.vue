@@ -40,7 +40,7 @@ export default {
       form.append('wallet',this.wallet);
 
       const response = await axios.post('/users/sign-in', form, {headers: headers});
-      console.log(response);
+      // console.log(response);
 
       localStorage.setItem('userID', response.data.data.id);
       localStorage.setItem('username', response.data.data.username);

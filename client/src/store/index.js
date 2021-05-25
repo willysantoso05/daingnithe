@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     userID: null,
     username: null,
+    files: []
   },
 
   getters: {
