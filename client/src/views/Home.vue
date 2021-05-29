@@ -7,26 +7,30 @@
       <br>
       <h4> Files </h4>
 
-      <form @submit.prevent="submitFile">
-        <h1 class="h3 mb-3 fw-normal">Upload New File</h1>
-        <label>Upload a new file</label>
-        <input @change="onFileChange" type="file" class="form-control" placeholder="File">
+      <div class="upload-file">
+        <form @submit.prevent="submitFile">
+          <label>Upload a new file</label>
+          <input @change="onFileChange" type="file" class="form-control" placeholder="File">
 
-        <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Upload</button>
-      </form>
+          <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Upload</button>
+        </form>
+      </div>
 
-      <ul v-if="files">
-        <li v-for="file in files" :key="file.id">
-          <ul>
-            <li>
-              <span class="fileName"> {{file.FileName}} </span>
-              <span class="ownerFile"> {{file.OwnerFile}} </span>
-              <!-- <span class="fileName"> {{file.FileName}} </span> -->
-              <span class="lastUpdated"> {{file.LastUpdated}} </span>
-            </li>
-          </ul>
-        </li>
-      </ul>
+      <div>
+        <ul v-if="files">
+          <li v-for="file in files" :key="file.ID">
+            <router-link :to="`/file/${file.ID}`">
+              <ul>
+                <li>
+                  <span class="fileName"> {{file.FileName}} </span>
+                  <span class="ownerFile"> {{file.OwnerFile}} </span>
+                  <span class="lastUpdated"> {{file.LastUpdated}} </span>
+                </li>
+              </ul>
+            </router-link>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -34,6 +38,7 @@
 <script>
 import {mapGetters} from 'vuex';
 import axios from 'axios';
+import service from '../utils/req';
 
 export default {
   name: "Home",
@@ -45,13 +50,15 @@ export default {
   },
   async created() {
     if (this.userID && this.username){
-      const response = await axios.get('file');
+      // axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+
+      const response = await service.get('file');
 
       let result = null
       if (response.data.data.length != 0){
         result = response.data.data
       }
-      console.log(response);
+      // console.log(response);
 
       this.files = result
     }
@@ -76,7 +83,7 @@ export default {
 
       const response = await axios.post('/file', form, {headers: headers});
       console.log(response);
-      this.$router.go()
+      this.$router.go();
     }
   }
 }
