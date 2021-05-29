@@ -37,7 +37,6 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import axios from 'axios';
 import service from '../utils/req';
 
 export default {
@@ -50,15 +49,12 @@ export default {
   },
   async created() {
     if (this.userID && this.username){
-      // axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
-
       const response = await service.get('file');
 
       let result = null
       if (response.data.data.length != 0){
         result = response.data.data
       }
-      // console.log(response);
 
       this.files = result
     }
@@ -81,8 +77,14 @@ export default {
       var form = new FormData();
       form.append('file',this.newFile);
 
-      const response = await axios.post('/file', form, {headers: headers});
-      console.log(response);
+      try{
+        const response = await service.post('/file', form, {headers: headers});
+        console.log(response);
+        this.newFile = null
+      } catch(err){
+        console.log(err)
+      }
+      
       this.$router.go();
     }
   }
