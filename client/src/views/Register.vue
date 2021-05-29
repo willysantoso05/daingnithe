@@ -39,13 +39,18 @@ export default {
         "Content-Type": "application/x-www-form-urlencoded"
       }
 
-      const response = await axios.post('users/register', querystring.stringify(data),{
-                                headers: headers,
-                                responseType: 'blob'
-                              });
-      download(response.data, "Wallet.id")
-
-      this.$router.push('/login').catch(()=>{});
+      try{
+        const response = await axios.post('users/register', querystring.stringify(data),{
+                                  headers: headers,
+                                  responseType: 'blob'
+                                });
+        download(response.data, "Wallet.id")
+  
+        this.$router.push('/login');
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
     }
   }
 }

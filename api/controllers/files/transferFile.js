@@ -37,7 +37,7 @@ exports.transferFile = async (req, res, next) => {
         }
 
         //Check if new owner is not in granted user list
-        if(accessUserList.hasOwnProperty(targetUserId)){
+        if(!accessUserList.hasOwnProperty(targetUserId)){
             res.json({status:"SUCCESS", message: "User has already no access", data:null});
             wallet.deleteWallet(walletId);
             return;

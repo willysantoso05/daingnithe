@@ -13,7 +13,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
+import service from '../utils/req';
 
 export default {
   name: "Login",
@@ -39,21 +40,25 @@ export default {
       form.append('password',this.password);
       form.append('wallet',this.wallet);
 
-      const response = await axios.post('/users/sign-in', form, {headers: headers});
-      // console.log(response);
-
-      localStorage.setItem('userID', response.data.data.id);
-      localStorage.setItem('username', response.data.data.username);
-      localStorage.setItem('token', response.data.data.token);
-      
-      this.$store.dispatch('userID', response.data.data.id);
-      this.$store.dispatch('username', response.data.data.username);
-      this.$router.push('/').catch(()=>{});
+      try{
+        const response = await service.post('/users/sign-in', form, {headers: headers});
+        localStorage.setItem('userID', response.data.data.id);
+        localStorage.setItem('username', response.data.data.username);
+        localStorage.setItem('token', response.data.data.token);
+        
+        this.$store.dispatch('userID', response.data.data.id);
+        this.$store.dispatch('username', response.data.data.username);
+        this.$router.push('/');
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
     }
   },
+
   updated(){
     if (this.userID && this.username){
-      this.$router.push('/').catch(()=>{});
+      this.$router.push('/');
     }
   }
 }
