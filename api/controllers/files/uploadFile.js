@@ -65,7 +65,7 @@ exports.uploadFile = async (req, res, next) => {
             console.log("---CREATE FILE ASSET");
             await createFileContract.createFileAsset(walletId, fileID, fileName, mimeType, ipfsPath, shares[0].toString('binary'), userId, JSON.stringify(grantedUserList));
         } catch (err) {
-            res.json({status:"ERROR", message: err, data:null});
+            res.status(500).json({status:"ERROR", message: err, data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -75,7 +75,7 @@ exports.uploadFile = async (req, res, next) => {
             console.log("---CREATE KEY ASSET");
             await createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1].toString('binary'));
         } catch (err) {
-            res.json({status:"ERROR", message: err, data:null});
+            res.status(500).json({status:"ERROR", message: err, data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -90,7 +90,7 @@ exports.uploadFile = async (req, res, next) => {
             }
         });
     } catch (err){
-        res.json({status:"ERROR", message: err, data:null});
+        res.status(500).json({status:"ERROR", message: err, data:null});
     }
     wallet.deleteWallet(walletId);
 }

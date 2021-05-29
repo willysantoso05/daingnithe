@@ -22,7 +22,7 @@ exports.deleteFile = async (req, res, next) => {
     try {
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
-            res.json({status:"ERROR", message: "File asset is not found", data:null});
+            res.status(404).json({status:"ERROR", message: "File asset is not found", data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -40,7 +40,7 @@ exports.deleteFile = async (req, res, next) => {
             try {
                 await deleteKeyContract.deleteKeyAsset(walletId, userId, key.toString());
             } catch (err) {
-                res.json({status:"ERROR", message: err, data:null});
+                res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
                 return;
             }
@@ -50,7 +50,7 @@ exports.deleteFile = async (req, res, next) => {
         try {
             await deleteFileContract.deleteFileAsset(walletId, userId, fileId);
         } catch (err) {
-            res.json({status:"ERROR", message: err, data:null});
+            res.status(500).json({status:"ERROR", message: err, data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -59,7 +59,7 @@ exports.deleteFile = async (req, res, next) => {
             "File ID": fileId
         }});
     } catch (err) {
-        res.json({status:"ERROR", message: err, data:null});
+        res.status(500).json({status:"ERROR", message: err, data:null});
     }
     wallet.deleteWallet(walletId);
 }

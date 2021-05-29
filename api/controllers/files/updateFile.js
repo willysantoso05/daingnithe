@@ -32,7 +32,7 @@ exports.updateFile = async (req, res, next) => {
         //Check if file id exist
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
-            res.json({status:"ERROR", message: "File asset is not found", data:null});
+            res.status(404).json({status:"ERROR", message: "File asset is not found", data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -69,7 +69,7 @@ exports.updateFile = async (req, res, next) => {
             console.log("---UPDATE FILE ASSET");
             await updateFileContract.updateFileAsset(walletId, userId, fileId, fileName, mimeType, ipfsPath, shares[0].toString('binary'));
         } catch (err) {
-            res.json({status:"ERROR", message: err, data:null});
+            res.status(500).json({status:"ERROR", message: err, data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -86,7 +86,7 @@ exports.updateFile = async (req, res, next) => {
             try {
                 await updateKeyContract.updateKeyAsset(walletId, userId, key, shares[i+1].toString('binary'));
             } catch (err) {
-                res.json({status:"ERROR", message: err, data:null});
+                res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
                 return;
             }
@@ -102,7 +102,7 @@ exports.updateFile = async (req, res, next) => {
         });
 
     } catch (err){
-        res.json({status:"ERROR", message: err, data:null});
+        res.status(500).json({status:"ERROR", message: err, data:null});
     }
     wallet.deleteWallet(walletId);
 }

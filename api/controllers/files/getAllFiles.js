@@ -50,7 +50,7 @@ exports.getAllFiles = async (req,res) => {
             res.json({status: "SUCCESS", message: "Get All Files Assets", data:temp});
         }
     } catch (err) {
-        res.json({status: "ERROR", message: err, data:null});
+        res.status(500).json({status: "ERROR", message: err, data:null});
     }
     wallet.deleteWallet(walletId);
 };

@@ -35,7 +35,7 @@ exports.create = (req, res, next) => {
                     res.download(filePath, `${userName}.id`, function (err) {
                         if (err) {
                             console.log(err);
-                            res.status(400).json({status:"ERROR", message: "Downloading Wallet Failed", data:null});
+                            res.status(500).json({status:"ERROR", message: "Downloading Wallet Failed", data:null});
                         }
                         wallet.deleteWallet(userName);
                     });
@@ -43,7 +43,7 @@ exports.create = (req, res, next) => {
                 }
             });
         } else {
-            res.status(400).json({status:"ERROR", message: "Creating wallet error", data:null});
+            res.status(500).json({status:"ERROR", message: "Creating wallet error", data:null});
         }
     });
 }

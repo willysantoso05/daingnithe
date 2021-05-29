@@ -39,7 +39,7 @@ exports.historyFile = async (req,res) => {
             res.json({status:"SUCCESS", message: "Get history file asset", data:temp});
         }
     } catch (err) {
-        res.json({status:"ERROR", message: err, data:null});
+        res.status(500).json({status:"ERROR", message: err, data:null});
     }
     wallet.deleteWallet(walletId);
 };

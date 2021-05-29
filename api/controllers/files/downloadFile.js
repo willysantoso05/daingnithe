@@ -27,7 +27,7 @@ exports.downloadFile = async (req, res, next) => {
     try {
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
-            res.json({status:"ERROR", message: "File asset is not found", data:null});
+            res.status(404).json({status:"ERROR", message: "File asset is not found", data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -38,7 +38,7 @@ exports.downloadFile = async (req, res, next) => {
 
         let keyAsset = await readKeyContract.readKeyAsset(walletId, userId, ownerKeyId);
         if (!keyAsset) {
-            res.json({status:"ERROR", message: "Key asset is not found", data:null});
+            res.status(404).json({status:"ERROR", message: "Key asset is not found", data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -72,7 +72,7 @@ exports.downloadFile = async (req, res, next) => {
 
         // res.json({status:"success", message: "Downloading File", data:null});
     } catch (err) {
-        res.json({status:"ERROR", message: err, data:null});
+        res.status(500).json({status:"ERROR", message: err, data:null});
     }
     wallet.deleteWallet(walletId);
 }

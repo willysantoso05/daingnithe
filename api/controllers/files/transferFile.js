@@ -22,7 +22,7 @@ exports.transferFile = async (req, res, next) => {
         //Check if file id exist
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
-            res.json({status:"ERROR", message: "File asset is not found", data:null});
+            res.status(404).json({status:"ERROR", message: "File asset is not found", data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -48,7 +48,7 @@ exports.transferFile = async (req, res, next) => {
             console.log("---TRANSFER FILE ASSET");
             await transferFileContract.transferFileAsset(walletId, userId, fileId, targetUserId);
         } catch (err) {
-            res.json({status:"ERROR", message: err, data:null});
+            res.status(500).json({status:"ERROR", message: err, data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -62,7 +62,7 @@ exports.transferFile = async (req, res, next) => {
             }
         });
     } catch (err){
-        res.json({status:"ERROR", message: err, data:null});
+        res.status(500).json({status:"ERROR", message: err, data:null});
     }
     wallet.deleteWallet(walletId);
 }

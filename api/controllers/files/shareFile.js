@@ -32,7 +32,7 @@ exports.shareFile = async (req, res, next) => {
         //Getting file asset info
         let fileAsset = await readFileContract.readFileAsset(walletId, fileId);
         if (!fileAsset) {
-            res.json({status:"ERROR", message: "File asset is not found", data:null});
+            res.status(404).json({status:"ERROR", message: "File asset is not found", data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -45,7 +45,7 @@ exports.shareFile = async (req, res, next) => {
         //Getting key asset info
         let keyAsset = await readKeyContract.readKeyAsset(walletId, userId, ownerKeyId);
         if (!keyAsset) {
-            res.json({status:"ERROR", message: "Key asset is not found", data:null});
+            res.status(404).json({status:"ERROR", message: "Key asset is not found", data:null});
             wallet.deleteWallet(walletId);
             return;
         }
@@ -79,7 +79,7 @@ exports.shareFile = async (req, res, next) => {
                 console.log("---SHARE FILE ASSET");
                 await shareFileContract.shareFileAsset(walletId, userId, fileId, newShares[0].toString('binary'), JSON.stringify(accessUserList));
             } catch (err) {
-                res.json({status:"ERROR", message: err, data:null});
+                res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
                 return;
             }
@@ -89,7 +89,7 @@ exports.shareFile = async (req, res, next) => {
                 console.log("---CREATE KEY ASSET");
                 await createKeyContract.createKeyAsset(walletId, keyID, targetUserId, fileId, userId, newShares[1].toString('binary'));
             } catch (err) {
-                res.json({status:"ERROR", message: err, data:null});
+                res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
                 return;
             }
@@ -106,7 +106,7 @@ exports.shareFile = async (req, res, next) => {
                 try {
                     await updateKeyContract.updateKeyAsset(walletId, userId, key, newShares[i+2].toString('binary'));
                 } catch (err) {
-                    res.json({status:"ERROR", message: err, data:null});
+                    res.status(500).json({status:"ERROR", message: err, data:null});
                     wallet.deleteWallet(walletId);
                     return;
                 }
@@ -134,7 +134,7 @@ exports.shareFile = async (req, res, next) => {
                 console.log("---SHARE FILE ASSET");
                 await shareFileContract.shareFileAsset(walletId, userId, fileId, newShares[0].toString('binary'), JSON.stringify(accessUserList));
             } catch (err) {
-                res.json({status:"ERROR", message: err, data:null});
+                res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
                 return;
             }
@@ -144,7 +144,7 @@ exports.shareFile = async (req, res, next) => {
                 console.log("---DELETE KEY ASSET");
                 await deleteKeyContract.deleteKeyAsset(walletId, userId, targetKeyID);
             } catch (err) {
-                res.json({status:"ERROR", message: err, data:null});
+                res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
                 return;
             }
@@ -161,13 +161,13 @@ exports.shareFile = async (req, res, next) => {
                 try {
                     await updateKeyContract.updateKeyAsset(walletId, userId, key, newShares[i+1].toString('binary'));
                 } catch (err) {
-                    res.json({status:"ERROR", message: err, data:null});
+                    res.status(500).json({status:"ERROR", message: err, data:null});
                     wallet.deleteWallet(walletId);
                     return;
                 }
             }
         } else {
-            res.json({status:"ERROR", message: "Error action", data:null});
+            res.status(500).json({status:"ERROR", message: "Error action", data:null});
         }
 
         res.json({
@@ -181,7 +181,7 @@ exports.shareFile = async (req, res, next) => {
             }
         });
     } catch (err) {
-        res.json({status:"ERROR", message: err, data:null});
+        res.status(500).json({status:"ERROR", message: err, data:null});
     }
     wallet.deleteWallet(walletId);
 }
