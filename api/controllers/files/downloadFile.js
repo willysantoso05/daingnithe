@@ -70,6 +70,15 @@ exports.downloadFile = async (req, res, next) => {
 
         readStream.pipe(res);
 
+        readStream.on("close", function() {
+            res.status(200);
+            res.end();
+        });
+        readStream.on("error", function() {
+            res.status(400);
+            res.end();
+        });
+
         // res.json({status:"success", message: "Downloading File", data:null});
     } catch (err) {
         res.status(500).json({status:"ERROR", message: err, data:null});

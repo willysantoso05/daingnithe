@@ -2,7 +2,7 @@
   <div>
     <div class="detail-header">
       <h1> FILE DETAIL</h1>
-      <button> Download </button>
+      <button @click="downloadFile"> Download </button>
       <button> Update </button>
     </div>
     
@@ -60,159 +60,167 @@ import {mapGetters} from 'vuex';
 import service from '../utils/req';
 
 export default {
-    name: "FileDetail",
-    data(){
-        return{
-            idFile: this.$route.params.fileID,
-            file: {
-                ID: null,
-                FileName: null,
-                OwnerID: null, 
-                AccessUserList: null
-            },
-            deleteFlag: false,
-            transferFlag: false,
-            selectedTransfer: null
-        }
-    },
-
-    async created(){
-        const response = await service.get('file');
-
-        let result = response.data.data;
-
-        this.file = result.find(res => {
-            return res.ID == this.idFile
-        })
-    },
-
-    computed: {
-        ...mapGetters(['userID', 'username']),
-        targetTransfer () {
-          let opt = [];
-
-          const keys = Object.keys(this.file.AccessUserList);
-          for (let i = 0; i < keys.length; i++) {
-            if (keys[i] != this.file.OwnerID && keys[i]!=this.userID){
-              opt.push(keys[i])
-            }
-          }
-          return opt;
-        }
-    },
-
-    methods:{
-        onFileChange(event) {
-          this.newFile = event.target.files[0]
-          console.log(event.target.files)
-        },
-
-        onChangeTransferButton () {
-          this.transferFlag = !this.transferFlag;
-        },
-
-        async downloadFile() {
-            const response = await service.get(`/file/${this.$route.params.fileID}`);
-            console.log(response);
-            this.$router.go();
-        },
-
-        async deleteFile() {
-          try{
-            const response = await service.delete(`/file/${this.$route.params.fileID}`);
-            console.log(response);
-          } catch (err) {
-            console.log(err);
-          }
-          this.$router.push('/');
-        },
-
-        async updateFile() {
-          const headers = { 
-            "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
-          }
-
-          var form = new FormData();
-          form.append('file',this.newFile);
-
-          try {
-            const response = await service.post(`/file/${this.$route.params.fileID}`, form, {headers: headers});
-            console.log(response);
-            this.$router.go();
-          } catch (err) {
-            console.log(err.response.data.message);
-            alert(err.response.data.message);
-          }
-
-          this.$router.go();
-        },
-
-        async transferFile(targetUserID) {
-          console.log(targetUserID);
-          const headers = { 
-            "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
-          }
-
-          var form = new FormData();
-          form.append('userId', targetUserID);
-
-          try{
-            const response = await service.put(`file/transfer/${this.$route.params.fileID}`, form, {headers: headers});
-            console.log(response);
-          } catch (err) {
-            console.log(err.response.data.message);
-            alert(err.response.data.message);
-          }
-
-          this.targetTransfer = null
-          this.$router.go();
-        },
-
-        async grantAccessFile(targetUserID){
-          const action = 'GRANT';
-
-          const headers = { 
-            "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
-          }
-
-          var form = new FormData();
-          form.append('access', action);
-          form.append('userId', targetUserID);
-
-          try{
-            const response = await service.put(`file/access/${this.$route.params.fileID}`, form, {headers: headers});
-            console.log(targetUserID);
-            console.log(response);
-          } catch (err) {
-            console.log(err.response.data.message);
-            alert(err.response.data.message);
-          }
-
-          this.$router.go();
-        },
-
-        async revokeAccessFile(targetUserID){
-          const action = 'REVOKE';
-
-          const headers = { 
-            "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
-          }
-
-          var form = new FormData();
-          form.append('access', action);
-          form.append('userId', targetUserID);
-
-          try{
-            const response = await service.put('file/access/' + this.$route.params.fileID, form, {headers: headers});
-            console.log(targetUserID);
-            console.log(response);
-          } catch (err) {
-            console.log(err.response.data.message);
-            alert(err.response.data.message);
-          }
-
-          this.$router.go();
-        }
+  name: "FileDetail",
+  data(){
+    return{
+      idFile: this.$route.params.fileID,
+      file: {
+        ID: null,
+        FileName: null,
+        OwnerID: null, 
+        AccessUserList: null
+      },
+      deleteFlag: false,
+      transferFlag: false,
+      selectedTransfer: null
     }
+  },
+
+  async created(){
+    const response = await service.get('file');
+
+    let result = response.data.data;
+
+    this.file = result.find(res => {
+      return res.ID == this.idFile
+    })
+  },
+
+  computed: {
+    ...mapGetters(['userID', 'username']),
+    targetTransfer () {
+      let opt = [];
+
+      const keys = Object.keys(this.file.AccessUserList);
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i] != this.file.OwnerID && keys[i]!=this.userID){
+          opt.push(keys[i])
+        }
+      }
+      return opt;
+    }
+  },
+
+  methods:{
+    onFileChange(event) {
+      this.newFile = event.target.files[0]
+    },
+
+    onChangeTransferButton () {
+      this.transferFlag = !this.transferFlag;
+    },
+
+    async downloadFile() {
+      try{
+        const response = await service.get(`/file/${this.$route.params.fileID}`, {responseType:'blob'});
+        var url = window.URL.createObjectURL(response.data);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = this.file.FileName;
+        a.click();
+        a.remove();
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
+    },
+
+    async deleteFile() {
+      try{
+        const response = await service.delete(`/file/${this.$route.params.fileID}`);
+        console.log(response);
+      } catch (err) {
+        console.log(err);
+      }
+      this.$router.push('/');
+    },
+
+    async updateFile() {
+      const headers = { 
+        "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
+      }
+
+      var form = new FormData();
+      form.append('file',this.newFile);
+
+      try {
+        const response = await service.post(`/file/${this.$route.params.fileID}`, form, {headers: headers});
+        console.log(response);
+        this.$router.go();
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
+
+      this.$router.go();
+    },
+
+    async transferFile(targetUserID) {
+      console.log(targetUserID);
+      const headers = { 
+        "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
+      }
+
+      var form = new FormData();
+      form.append('userId', targetUserID);
+
+      try{
+        const response = await service.put(`file/transfer/${this.$route.params.fileID}`, form, {headers: headers});
+        console.log(response);
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
+
+      this.targetTransfer = null
+      this.$router.go();
+    },
+
+    async grantAccessFile(targetUserID){
+      const action = 'GRANT';
+
+      const headers = { 
+        "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
+      }
+
+      var form = new FormData();
+      form.append('access', action);
+      form.append('userId', targetUserID);
+
+      try{
+        const response = await service.put(`file/access/${this.$route.params.fileID}`, form, {headers: headers});
+        console.log(targetUserID);
+        console.log(response);
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
+
+      this.$router.go();
+    },
+
+    async revokeAccessFile(targetUserID){
+      const action = 'REVOKE';
+
+      const headers = { 
+        "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
+      }
+
+      var form = new FormData();
+      form.append('access', action);
+      form.append('userId', targetUserID);
+
+      try{
+        const response = await service.put('file/access/' + this.$route.params.fileID, form, {headers: headers});
+        console.log(targetUserID);
+        console.log(response);
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
+
+      this.$router.go();
+    }
+  }
 }
 </script>
