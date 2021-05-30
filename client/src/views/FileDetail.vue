@@ -3,7 +3,16 @@
     <div class="detail-header">
       <h1> FILE DETAIL</h1>
       <button @click="downloadFile"> Download </button>
-      <button> Update </button>
+      <button @click="onChangeUpdateButton"> Update </button>
+
+      <div v-if="updateFlag" class="upload-updated-file">
+        <form @submit.prevent="updateFile">
+          <label>Upload updated file</label>
+          <input @change="onFileChange" type="file" class="form-control" placeholder="Updated File">
+
+          <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Upload</button>
+        </form>
+      </div>
     </div>
     
     <br>
@@ -18,7 +27,17 @@
         </li>
         <li>
           <h5> Access User List : </h5>
-          <button> Share </button>
+          <button @click="onChangeShareButton"> Share </button>
+          
+          <div v-if="shareFlag" class="share-file">
+            <form @submit.prevent="grantAccessFile">
+              <label>Input user ID :</label>
+              <input v-model="selectedShare" class="form-control" placeholder="Username">
+
+              <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Share Access</button>
+            </form>
+          </div>
+          
           <ul>
             <li v-for="(value, user) in file.AccessUserList" :key="user">
               <h5> {{user}}  
@@ -70,20 +89,27 @@ export default {
         OwnerID: null, 
         AccessUserList: null
       },
-      deleteFlag: false,
+      updatedFile: null,
+      shareFlag: false,
+      updateFlag: false,
       transferFlag: false,
-      selectedTransfer: null
+      selectedTransfer: null,
+      selectedShare: null
     }
   },
 
   async created(){
-    const response = await service.get('file');
+    try{
+      const response = await service.get('file');
+      let result = response.data.data;
 
-    let result = response.data.data;
-
-    this.file = result.find(res => {
-      return res.ID == this.idFile
-    })
+      this.file = result.find(res => {
+        return res.ID == this.idFile
+      })
+    } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
   },
 
   computed: {
@@ -103,7 +129,16 @@ export default {
 
   methods:{
     onFileChange(event) {
-      this.newFile = event.target.files[0]
+      this.updatedFile = event.target.files[0]
+      console.log(event.target.files);
+    },
+
+    onChangeUpdateButton () {
+      this.updateFlag = !this.updateFlag;
+    },
+
+    onChangeShareButton () {
+      this.shareFlag = !this.shareFlag;
     },
 
     onChangeTransferButton () {
@@ -141,17 +176,18 @@ export default {
       }
 
       var form = new FormData();
-      form.append('file',this.newFile);
+      form.append('file',this.updatedFile);
 
       try {
-        const response = await service.post(`/file/${this.$route.params.fileID}`, form, {headers: headers});
+        const response = await service.put(`/file/${this.$route.params.fileID}`, form, {headers: headers});
+        console.log("AAA");
         console.log(response);
-        this.$router.go();
+        this.updateFlag = false,
+        this.updatedFile = null;
       } catch (err) {
         console.log(err.response.data.message);
         alert(err.response.data.message);
       }
-
       this.$router.go();
     },
 
@@ -176,8 +212,9 @@ export default {
       this.$router.go();
     },
 
-    async grantAccessFile(targetUserID){
+    async grantAccessFile(){
       const action = 'GRANT';
+      let targetUserID = this.selectedShare;
 
       const headers = { 
         "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>"
@@ -191,6 +228,7 @@ export default {
         const response = await service.put(`file/access/${this.$route.params.fileID}`, form, {headers: headers});
         console.log(targetUserID);
         console.log(response);
+        this.selectedShare = null;
       } catch (err) {
         console.log(err.response.data.message);
         alert(err.response.data.message);
