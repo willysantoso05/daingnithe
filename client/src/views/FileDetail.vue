@@ -71,7 +71,26 @@
       </div>
     </div>
 
+    <br>
+    <button @click="onChangeHistoryButton"> Show History File </button>
+
+    <div v-if="historyFlag">
+      <ul v-if="historyFiles">
+        <li v-for="version in historyFiles" :key=" version.Version + '_' + version.ID">
+          <ul>
+            <li>
+              <span class="FileName"> {{version.FileName}} </span>
+              <span class="OwnerFile"> {{version.OwnerID}} </span>
+              <span class="LastUpdatedTime"> {{version.LastUpdatedTime}} </span>
+              <span class="LastUpdatedBy"> {{version.LastUpdatedBy}} </span>
+              <button v-if="version.CanDownload" @click="downloadHistoryFile(version.FileName, Number(version.Version))"> Download </button>
+            </li>
+          </ul>
+        </li>
+      </ul>
     </div>
+
+  </div>
 </template>
 
 <script>
@@ -92,13 +111,16 @@ export default {
       updatedFile: null,
       shareFlag: false,
       updateFlag: false,
+      historyFlag: false,
       transferFlag: false,
       selectedTransfer: null,
-      selectedShare: null
+      selectedShare: null,
+      historyFiles : null
     }
   },
 
   async created(){
+    //Fetch File Detail
     try{
       const response = await service.get('file');
       let result = response.data.data;
@@ -109,6 +131,29 @@ export default {
     } catch (err) {
         console.log(err.response.data.message);
         alert(err.response.data.message);
+    }
+
+    //Fetch File History
+    try{
+      const historyResponse = await service.get(`/file/history/${this.$route.params.fileID}`);
+      let historyResults = null
+      if (historyResponse.data.data.length != 0){
+        historyResults = historyResponse.data.data
+
+        for(let i=0; i<historyResults.length; i++){
+          // let accessUserList = JSON.parse(history.AccessUserList)
+          if(Object.prototype.hasOwnProperty.call(historyResults[i].AccessUserList, this.userID)){
+            historyResults[i]["CanDownload"] = true;
+          } else {
+            historyResults[i]["CanDownload"] = false;
+          }
+          console.log(historyResults[i]);
+        }
+      }
+      this.historyFiles = historyResults
+    } catch (err) {
+        console.log(err.historyResponse.data.message);
+        alert(err.historyResponse.data.message);
       }
   },
 
@@ -143,6 +188,10 @@ export default {
 
     onChangeTransferButton () {
       this.transferFlag = !this.transferFlag;
+    },
+
+    onChangeHistoryButton () {
+      this.historyFlag = !this.historyFlag;
     },
 
     async downloadFile() {
@@ -258,6 +307,21 @@ export default {
       }
 
       this.$router.go();
+    },
+
+    async downloadHistoryFile(fileName, version){
+      try{
+        const response = await service.get(`/file/history/download/${this.$route.params.fileID}/${version}`, {responseType:'blob'});
+        var url = window.URL.createObjectURL(response.data);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        a.remove();
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
+      }
     }
   }
 }

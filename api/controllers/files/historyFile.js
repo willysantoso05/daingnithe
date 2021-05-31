@@ -35,6 +35,7 @@ exports.historyFile = async (req,res) => {
                     OwnerID : data[i].Value.OwnerID,
                     Version: data[i].Value.Version,
                     AccessUserList : JSON.parse(data[i].Value.AccessUserList),
+                    LastUpdatedTime: data[i].Value.LastUpdated,
                     LastUpdatedBy: data[i].Value.UpdatedBy
                 }
             }
