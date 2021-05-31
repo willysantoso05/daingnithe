@@ -88,20 +88,50 @@ $ ./initscript.sh
 $ node index.js
 ```
 
+## Setup & Configuration Client WebApp
+
+1. open new shell, back to root repository directory and go to `client` directory
+
+```
+$ cd ../client
+```
+
+2. Install client package
+
+```
+$ npm install
+```
+
+3. Run Client
+
+```
+$ npm run serve
+```
+
 # List API
 
-| Route endpoint              | Method   | Function                                                     |
-| --------------------------- | -------- | ------------------------------------------------------------ |
-| `/useres/register`          | `POST`   | Register account and create wallet                           |
-| `/users/sign-in`            | `POST`   | Sign in and get authorization token                          |
-| `/files/`                   | `GET`    | Getting all files asset                                      |
-| `/files/`                   | `POST`   | Upload a file to network                                     |
-| `/files/{FILE ID}`          | `GET`    | Download file from network with specified id                 |
-| `/files/{FILE ID}`          | `PUT`    | Update file from network with specified id                   |
-| `/files/{FILE ID}`          | `DELETE` | Delete file from network with specified id                   |
-| `/files/history/{FILE ID}`  | `GET`    | Get history of file from network with specified id           |
-| `/files/transfer/{FILE ID}` | `PUT`    | Change owner of file from network with specified id          |
-| `/files/access/{FILE ID}`   | `PUT`    | Grant / revoke access of file from network with specified id |
+| Route endpoint                                | Method   | Function                                                     |
+| --------------------------------------------- | -------- | ------------------------------------------------------------ |
+| `/useres/register`                            | `POST`   | Register account and create wallet                           |
+| `/users/sign-in`                              | `POST`   | Sign in and get authorization token                          |
+| `/files/`                                     | `GET`    | Getting all files asset                                      |
+| `/files/`                                     | `POST`   | Upload a file to network                                     |
+| `/files/{FILE ID}`                            | `GET`    | Download file from network with specified id                 |
+| `/files/{FILE ID}`                            | `PUT`    | Update file from network with specified id                   |
+| `/files/{FILE ID}`                            | `DELETE` | Delete file from network with specified id                   |
+| `/files/transfer/{FILE ID}`                   | `PUT`    | Change owner of file from network with specified id          |
+| `/files/access/{FILE ID}`                     | `PUT`    | Grant / revoke access of file from network with specified id |
+| `/files/history/{FILE ID}`                    | `GET`    | Get history of file from network with specified id           |
+| `/files/history/download/{FILE ID}/{Version}` | `GET`    | Download history of file from network with specified version |
+
+# List Web Page Endpoint
+
+| Route endpoint    | Function                                                    |
+| ----------------- | ----------------------------------------------------------- |
+| `/register`       | Register account page                                       |
+| `/login`          | Sign in account page                                        |
+| `/home/`          | Home page with all files which are available to be accessed |
+| `/home/{FILE ID}` | File detail page of metadata & operation                    |
 
 # Author
 
