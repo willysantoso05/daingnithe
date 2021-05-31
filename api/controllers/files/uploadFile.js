@@ -32,6 +32,7 @@ exports.uploadFile = async (req, res, next) => {
         //generate file id
         const fileID = "FILE_" + uuidv4().toString();
         const keyID = "KEY_" + uuidv4().toString();
+        const fileVersion = 1;
 
         let grantedUserList = {};
         grantedUserList[userId] = keyID;
@@ -73,7 +74,7 @@ exports.uploadFile = async (req, res, next) => {
         //create key transaction
         try {
             console.log("---CREATE KEY ASSET");
-            await createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, shares[1].toString('binary'));
+            await createKeyContract.createKeyAsset(walletId, keyID, userId, fileID, userId, fileVersion, shares[1].toString('binary'));
         } catch (err) {
             res.status(500).json({status:"ERROR", message: err, data:null});
             wallet.deleteWallet(walletId);

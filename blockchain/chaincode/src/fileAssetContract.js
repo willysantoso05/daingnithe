@@ -19,6 +19,7 @@ class fileAssetContract extends Contract {
             IpfsPath: ipfsPath,
             SharedKey: sharedKey,
             OwnerID: ownerID,
+            Version: 1,
             AccessUserList: accessUserList,
             CreateDateTime: dt,
             LastUpdated: dt
@@ -62,6 +63,7 @@ class fileAssetContract extends Contract {
                 fileAsset.MimeType = mimeType;
                 fileAsset.IpfsPath = ipfsPath;
                 fileAsset.SharedKey = sharedKey;
+                fileAsset.Version += 1;
                 fileAsset.LastUpdated = dt;
             } catch (err) {
                 throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
@@ -91,6 +93,7 @@ class fileAssetContract extends Contract {
                 // Update Field
                 fileAsset.SharedKey = sharedKey;
                 fileAsset.AccessUserList = accessUserList;
+                fileAsset.Version += 1;
                 fileAsset.LastUpdated = dt;
             } catch (err) {
                 throw new Error(`id = ${fileId} data can't be processed`);
@@ -141,6 +144,7 @@ class fileAssetContract extends Contract {
 
                 // Update Owner Field
                 fileAsset.OwnerID = newOwnerID;
+                // fileAsset.Version += 1;
                 fileAsset.LastUpdated = dt;
             } catch (err) {
                 throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
@@ -168,7 +172,7 @@ class fileAssetContract extends Contract {
                 console.log(err);
                 record = strValue;
             }
-            if (Object.keys(record).length == 9){
+            if (Object.keys(record).length == 10){
                 allResults.push({ Key: result.value.key, Record: record });
             }
             result = await iterator.next();

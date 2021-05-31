@@ -41,6 +41,7 @@ exports.getAllFiles = async (req,res) => {
                         ID : data[i].Record.ID,
                         FileName: data[i].Record.FileName,
                         OwnerID : data[i].Record.OwnerID,
+                        Version: data[i].Record.Version,
                         AccessUserList : granted_users,
                         LastUpdated: data[i].Record.LastUpdated
                     });

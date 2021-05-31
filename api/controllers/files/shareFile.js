@@ -38,6 +38,7 @@ exports.shareFile = async (req, res, next) => {
         }
         fileAsset = JSON.parse(fileAsset);
 
+        let fileVersion = Number(fileAsset.Version) + 1;
         let accessUserList = JSON.parse(fileAsset.AccessUserList)
         const totalGrantedUser = Object.keys(accessUserList).length;
         const ownerKeyId = accessUserList[userId];
@@ -87,7 +88,7 @@ exports.shareFile = async (req, res, next) => {
             //create key transaction
             try {
                 console.log("---CREATE KEY ASSET");
-                await createKeyContract.createKeyAsset(walletId, keyID, targetUserId, fileId, userId, newShares[1].toString('binary'));
+                await createKeyContract.createKeyAsset(walletId, keyID, targetUserId, fileId, userId, fileVersion, newShares[1].toString('binary'));
             } catch (err) {
                 res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
@@ -104,7 +105,7 @@ exports.shareFile = async (req, res, next) => {
 
                 //update key transaction
                 try {
-                    await updateKeyContract.updateKeyAsset(walletId, userId, key, newShares[i+2].toString('binary'));
+                    await updateKeyContract.updateKeyAsset(walletId, userId, key, fileVersion, newShares[i+2].toString('binary'));
                 } catch (err) {
                     res.status(500).json({status:"ERROR", message: err, data:null});
                     wallet.deleteWallet(walletId);
@@ -159,7 +160,7 @@ exports.shareFile = async (req, res, next) => {
 
                 //update key transaction
                 try {
-                    await updateKeyContract.updateKeyAsset(walletId, userId, key, newShares[i+1].toString('binary'));
+                    await updateKeyContract.updateKeyAsset(walletId, userId, key, fileVersion, newShares[i+1].toString('binary'));
                 } catch (err) {
                     res.status(500).json({status:"ERROR", message: err, data:null});
                     wallet.deleteWallet(walletId);

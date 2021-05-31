@@ -39,6 +39,7 @@ exports.updateFile = async (req, res, next) => {
         fileAsset = JSON.parse(fileAsset);
 
         const ipfsPath = fileAsset.IpfsPath;
+        let fileVersion = Number(fileAsset.Version) + 1;
         let accessUserList = JSON.parse(fileAsset.AccessUserList)
         const totalGrantedUser = Object.keys(accessUserList).length;
 
@@ -84,7 +85,7 @@ exports.updateFile = async (req, res, next) => {
 
             //update key transaction
             try {
-                await updateKeyContract.updateKeyAsset(walletId, userId, key, shares[i+1].toString('binary'));
+                await updateKeyContract.updateKeyAsset(walletId, userId, key, fileVersion, shares[i+1].toString('binary'));
             } catch (err) {
                 res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
