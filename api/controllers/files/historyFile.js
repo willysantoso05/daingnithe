@@ -34,7 +34,8 @@ exports.historyFile = async (req,res) => {
                     FileName : data[i].Value.FileName,
                     OwnerID : data[i].Value.OwnerID,
                     Version: data[i].Value.Version,
-                    AccessUserList : JSON.parse(data[i].Value.AccessUserList)
+                    AccessUserList : JSON.parse(data[i].Value.AccessUserList),
+                    LastUpdatedBy: data[i].Value.UpdatedBy
                 }
             }
             res.json({status:"SUCCESS", message: "Get history file asset", data:temp});

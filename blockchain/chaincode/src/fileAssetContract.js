@@ -22,7 +22,8 @@ class fileAssetContract extends Contract {
             Version: 1,
             AccessUserList: accessUserList,
             CreateDateTime: dt,
-            LastUpdated: dt
+            LastUpdated: dt,
+            UpdatedBy: ownerID
         };
         await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
         return JSON.stringify(fileAsset);
@@ -65,6 +66,7 @@ class fileAssetContract extends Contract {
                 fileAsset.SharedKey = sharedKey;
                 fileAsset.Version += 1;
                 fileAsset.LastUpdated = dt;
+                fileAsset.UpdatedBy = userID;
             } catch (err) {
                 throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
             }
@@ -95,6 +97,7 @@ class fileAssetContract extends Contract {
                 fileAsset.AccessUserList = accessUserList;
                 fileAsset.Version += 1;
                 fileAsset.LastUpdated = dt;
+                fileAsset.UpdatedBy = userID;
             } catch (err) {
                 throw new Error(`id = ${fileId} data can't be processed`);
             }
@@ -146,6 +149,7 @@ class fileAssetContract extends Contract {
                 fileAsset.OwnerID = newOwnerID;
                 // fileAsset.Version += 1;
                 fileAsset.LastUpdated = dt;
+                fileAsset.UpdatedBy = userID;
             } catch (err) {
                 throw new Error(`id = ${fileId} data can't be processed\n ${err}`);
             }
@@ -172,7 +176,7 @@ class fileAssetContract extends Contract {
                 console.log(err);
                 record = strValue;
             }
-            if (Object.keys(record).length == 10){
+            if (Object.keys(record).length == 11){
                 allResults.push({ Key: result.value.key, Record: record });
             }
             result = await iterator.next();
