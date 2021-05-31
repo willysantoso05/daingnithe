@@ -1,13 +1,20 @@
 <template>
-  <form @submit.prevent="submit">
-    <h1 class="h3 mb-3 fw-normal">Sign Up</h1>
-    <input v-model="name" class="form-control mb-2" placeholder="Name">
-    <input v-model="username" class="form-control mb-2" placeholder="Username">
+  <div class="register-page d-flex justify-content-center">
+    <form @submit.prevent="submit">
+      <h1 class="h3 mb-3 fw-normal">Sign Up</h1>
 
-    <input v-model="password" type="password" class="form-control mb-2"  placeholder="Password">
+      <label class="mt-3">Name</label>
+      <input v-model="name" class="form-control mb-2" placeholder="Name">
 
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Register</button>
-  </form>
+      <label class="mt-3">Username</label>
+      <input v-model="username" class="form-control mb-2" placeholder="Username">
+
+      <label class="mt-3">Password</label>
+      <input v-model="password" type="password" class="form-control mb-2"  placeholder="Password">
+
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Register</button>
+    </form>
+  </div>
 </template>
 
 <script>

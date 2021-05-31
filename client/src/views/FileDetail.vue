@@ -1,93 +1,111 @@
 <template>
-  <div>
-    <div class="detail-header">
-      <h1> FILE DETAIL</h1>
-      <button @click="downloadFile"> Download </button>
-      <button @click="onChangeUpdateButton"> Update </button>
-
-      <div v-if="updateFlag" class="upload-updated-file">
-        <form @submit.prevent="updateFile">
-          <label>Upload updated file</label>
-          <input @change="onFileChange" type="file" class="form-control" placeholder="Updated File">
-
-          <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Upload</button>
-        </form>
+  <div class="w-75 mx-auto">
+    <div class="detail-header d-flex justify-content-between mb-3 pt-3">
+      <h1 class="text-center"> FILE DETAIL</h1>
+      <div>
+        <button class="mx-3 px-3 btn btn-dark" @click="onChangeHistoryButton"> <strong> Show File History </strong> </button>
+        <button v-if="userID==file.OwnerID" class="mx-3 px-3 btn btn-danger" @click="deleteFile"> <strong> DELETE </strong> </button>
+        <button class="mx-3 px-3 btn btn-warning" @click="onChangeUpdateButton"> <strong> UPDATE </strong> </button>
+        <button class="mx-3 px-3 btn btn-success" @click="downloadFile"> <strong> DOWNLOAD </strong> </button>
       </div>
+    </div>
+
+    <div v-if="updateFlag" class="upload-updated-file d-flex justify-content-center mb-3">
+      <form @submit.prevent="updateFile">
+        <h4>Upload updated file</h4>
+        <input @change="onFileChange" type="file" class="form-control" placeholder="Updated File">
+
+        <button class="w-100 btn btn-primary mt-3" type="submit">Upload</button>
+      </form>
     </div>
     
-    <br>
+    <div class="file-metadata border-top pt-3">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Metadata</th>
+            <th scope="col">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">FileName</th>
+            <td>{{file.FileName}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Owner File</th>
+            <td>{{file.OwnerID}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Last Update Time</th>
+            <td>{{file.LastUpdated}}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="file-metadata">
-      <ul>
-        <li>
-            <h5> File Name = {{file.FileName}} </h5>
-        </li>
-        <li>
-            <h5> File Owner = {{file.OwnerID}} </h5>
-        </li>
-        <li>
-          <h5> Access User List : </h5>
-          <button @click="onChangeShareButton"> Share </button>
-          
-          <div v-if="shareFlag" class="share-file">
-            <form @submit.prevent="grantAccessFile">
-              <label>Input user ID :</label>
-              <input v-model="selectedShare" class="form-control" placeholder="Username">
-
-              <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Share Access</button>
-            </form>
-          </div>
-          
-          <ul>
-            <li v-for="(value, user) in file.AccessUserList" :key="user">
-              <h5> {{user}}  
-                <button v-if="userID==file.OwnerID && user!=file.OwnerID" @click="revokeAccessFile(user)"> X </button>
-              </h5>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <h5> Last Updated = {{file.LastUpdated}} </h5>
-        </li>
-      </ul>
-    </div>
-
-    <br>
-
-    <div v-if="userID==file.OwnerID"> 
-      <h2> Owner Operation : </h2>
-      <br>
-      <button @click="deleteFile"> Delete </button>
-      <button @click="onChangeTransferButton"> Transfer </button>
-
-      <div v-if="transferFlag" class="transfer-file">
-        <select v-model="selectedTransfer">
-          <option disabled value="">Please select one</option>
-          <option v-for="userTarget in targetTransfer" :key="userTarget"> {{userTarget}}</option>
-        </select>
-        <span>Selected: {{ selectedTransfer }}</span>
-
-        <button v-if="selectedTransfer" @click="transferFile(selectedTransfer)"> Transfer </button>
+      <div class="d-flex justify-content-between mb-3 pt-3">
+        <h3> Access User List </h3>
+        <button class="mx-3 px-3 btn btn-primary" @click="onChangeShareButton"> <strong> Share </strong> </button>
       </div>
-    </div>
 
-    <br>
-    <button @click="onChangeHistoryButton"> Show History File </button>
+      <div v-if="shareFlag" class="share-file d-flex justify-content-center mb-3">
+        <form @submit.prevent="grantAccessFile">
+          <label>Input user ID :</label>
+          <input v-model="selectedShare" class="form-control" placeholder="Username">
+
+          <button class="w-100 btn btn-lg btn-primary mt-3" type="submit">Share Access</button>
+        </form>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">User ID</th>
+            <th scope="col">Revoke Access</th>
+            <th scope="col">Transfe File</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(value, user) in file.AccessUserList" :key="user">
+            <th scope="row">{{user}}</th>
+            <td>
+              <button class="btn btn-danger" v-if="userID==file.OwnerID && user!=file.OwnerID" @click="revokeAccessFile(user)"> <strong> Revoke </strong> </button>
+              <label v-if="userID!=file.OwnerID || user==file.OwnerID"> - </label>
+            </td>
+            <td>
+              <button class="btn btn-warning" v-if="userID==file.OwnerID && user!=file.OwnerID" @click="transferFile(user)"> <strong> Make Owner </strong> </button>
+              <label v-if="userID!=file.OwnerID || user==file.OwnerID"> - </label>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div v-if="historyFlag">
-      <ul v-if="historyFiles">
-        <li v-for="version in historyFiles" :key=" version.Version + '_' + version.ID">
-          <ul>
-            <li>
-              <span class="FileName"> {{version.FileName}} </span>
-              <span class="OwnerFile"> {{version.OwnerID}} </span>
-              <span class="LastUpdatedTime"> {{version.LastUpdatedTime}} </span>
-              <span class="LastUpdatedBy"> {{version.LastUpdatedBy}} </span>
-              <button v-if="version.CanDownload" @click="downloadHistoryFile(version.FileName, Number(version.Version))"> Download </button>
-            </li>
-          </ul>
-        </li>
-      </ul>
+      <h3 class="my-3 pt-3"> File History </h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">File Name</th>
+            <th scope="col">Owner File</th>
+            <th scope="col">Last Updated Time</th>
+            <th scope="col">Last Updated By User</th>
+            <th scope="col">Download</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr v-for="version in historyFiles" :key=" version.Version + '_' + version.ID">
+              <th scope="row">{{version.FileName}}</th>
+              <td>{{version.OwnerID}}</td>
+              <td>{{version.LastUpdatedTime}}</td>
+              <td>{{version.LastUpdatedBy}}</td>
+              <td>
+                <button class="btn btn-primary" v-if="version.CanDownload" @click="downloadHistoryFile(version.FileName, Number(version.Version))"> <strong> Download </strong> </button>
+                <label v-if="!version.CanDownload"> - </label>
+              </td>
+            </tr>
+          </tbody>
+      </table>
     </div>
 
   </div>
@@ -113,7 +131,6 @@ export default {
       updateFlag: false,
       historyFlag: false,
       transferFlag: false,
-      selectedTransfer: null,
       selectedShare: null,
       historyFiles : null
     }
@@ -141,7 +158,6 @@ export default {
         historyResults = historyResponse.data.data
 
         for(let i=0; i<historyResults.length; i++){
-          // let accessUserList = JSON.parse(history.AccessUserList)
           if(Object.prototype.hasOwnProperty.call(historyResults[i].AccessUserList, this.userID)){
             historyResults[i]["CanDownload"] = true;
           } else {

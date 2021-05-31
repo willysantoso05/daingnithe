@@ -1,35 +1,43 @@
 <template>
   <div>
-    <h1 v-if="!userID && !username"> File System with Hyperledger Fabric and IPFS</h1>
-    <div v-if="userID && username">
-      <h2> User : <strong>{{userID}}</strong></h2>
-      <h2> User : <strong>{{username}}</strong></h2>
+    <h1 class="d-flex justify-content-center mt-5 pt-5" v-if="!userID && !username"> File System with Hyperledger Fabric and IPFS</h1>
+    
+    <div class="w-75 mx-auto" v-if="userID && username">
+      <h2> User ID : <strong>{{userID}}</strong></h2>
+      <h2> Username : <strong>{{username}}</strong></h2>
       <br>
-      <h4> Files </h4>
 
-      <div class="upload-file">
+      <div class = "d-flex justify-content-between mb-3 border-top pt-3">
+        <h2 class="mt=5"> FILES </h2>
+        <button class = "btn btn-primary px-5" @click="onChangeUploadButton()"> Upload </button>
+      </div>
+
+      <div class="upload-file d-flex justify-content-center mb-5" v-if="uploadFlag">
         <form @submit.prevent="submitFile">
-          <label>Upload a new file</label>
+          <h4>Upload a new file</h4>
           <input @change="onFileChange" type="file" class="form-control" placeholder="File">
 
-          <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Upload</button>
+          <button class="w-100 btn btn-primary mt-4" type="submit">Upload</button>
         </form>
       </div>
 
-      <div>
-        <ul v-if="files">
-          <li v-for="file in files" :key="file.ID">
-            <router-link :to="`/file/${file.ID}`">
-              <ul>
-                <li>
-                  <span class="fileName"> {{file.FileName}} </span>
-                  <span class="ownerFile"> {{file.OwnerFile}} </span>
-                  <span class="lastUpdated"> {{file.LastUpdated}} </span>
-                </li>
-              </ul>
-            </router-link>
-          </li>
-        </ul>
+      <div v-if="files">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">FileName</th>
+              <th scope="col">Owner File</th>
+              <th scope="col">Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="file in files" :key="file.ID" @click="goToFileDetail(file.ID)">
+              <th scope="row">{{file.FileName}}</th>
+              <td>{{file.OwnerID}}</td>
+              <td>{{file.LastUpdated}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -44,7 +52,8 @@ export default {
   data(){
     return {
       newFile: null,
-      files: null
+      files: null,
+      uploadFlag: false
     }
   },
   async created() {
@@ -65,6 +74,14 @@ export default {
   },
 
   methods: {
+    goToFileDetail(id) {
+      this.$router.push(`/file/${id}`);
+    },
+
+    onChangeUploadButton () {
+      this.uploadFlag = !this.uploadFlag;
+    },
+
     onFileChange(event) {
       this.newFile = event.target.files[0]
       console.log(event.target.files)

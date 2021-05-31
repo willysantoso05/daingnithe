@@ -1,19 +1,22 @@
 <template>
-  <form @submit.prevent="submit">
-    <h1 class="h3 mb-3 fw-normal">Sign in</h1>
-    <input v-model="username" class="form-control" placeholder="Username">
+  <div class="login-page d-flex justify-content-center">
+    <form @submit.prevent="submit">
+      <h1 class="h3 mb-3 fw-normal">Sign in</h1>
+      <label class="mt-3">Username</label>
+      <input v-model="username" class="form-control" placeholder="Username">
+      
+      <label class="mt-3">Password</label>
+      <input v-model="password" type="password" class="form-control"  placeholder="Password">
 
-    <input v-model="password" type="password" class="form-control"  placeholder="Password">
+      <label class="mt-3">Wallet</label>
+      <input @change="onFileChange" type="file" class="form-control" placeholder="Wallet">
 
-    <label>Wallet</label>
-    <input @change="onFileChange" type="file" class="form-control" placeholder="Wallet">
-
-    <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Sign in</button>
-  </form>
+      <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Sign in</button>
+    </form>
+  </div>
 </template>
 
 <script>
-// import axios from 'axios';
 import service from '../utils/req';
 
 export default {
