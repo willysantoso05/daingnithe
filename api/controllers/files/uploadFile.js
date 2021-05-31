@@ -16,7 +16,7 @@ const createFileContract = require('../../script/file-contract/createFileContrac
 const createKeyContract = require('../../script/key-contract/createKeyContract');
 const wallet = require('../../script/wallet');
 
-const PATH = "/fabric-ipfs/";
+const PATH = "/fabric-ipfs";
 
 exports.uploadFile = async (req, res, next) => {
     const fileName = req.files.file.name;
@@ -37,7 +37,7 @@ exports.uploadFile = async (req, res, next) => {
         let grantedUserList = {};
         grantedUserList[userId] = keyID;
 
-        const ipfsPath = PATH + fileID + ".data";
+        const ipfsPath = `${PATH}/${fileID}/${fileVersion}.data`;
     
         //generate keys
         const {publicKey, privateKey} = encryption.generateKeys();

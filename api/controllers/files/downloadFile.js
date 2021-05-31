@@ -78,8 +78,6 @@ exports.downloadFile = async (req, res, next) => {
             res.status(400);
             res.end();
         });
-
-        // res.json({status:"success", message: "Downloading File", data:null});
     } catch (err) {
         res.status(500).json({status:"ERROR", message: err, data:null});
     }

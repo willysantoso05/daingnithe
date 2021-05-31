@@ -17,6 +17,8 @@ const updateFileContract = require('../../script/file-contract/updateFileContrac
 const updateKeyContract = require('../../script/key-contract/updateKeyContract');
 const wallet = require('../../script/wallet');
 
+const PATH = "/fabric-ipfs";
+
 exports.updateFile = async (req, res, next) => {
     const fileName = req.files.file.name;
     const mimeType = req.files.file.mimetype;
@@ -38,8 +40,8 @@ exports.updateFile = async (req, res, next) => {
         }
         fileAsset = JSON.parse(fileAsset);
 
-        const ipfsPath = fileAsset.IpfsPath;
         let fileVersion = Number(fileAsset.Version) + 1;
+        const ipfsPath = `${PATH}/${fileId}/${fileVersion}.data`;
         let accessUserList = JSON.parse(fileAsset.AccessUserList)
         const totalGrantedUser = Object.keys(accessUserList).length;
 

@@ -93,7 +93,7 @@ class keyAssetContract extends Contract {
     }
 
     // GetKeyAssetHistory returns the chain of custody for an asset since issuance.
-	async GetFileAssetHistory(ctx, id) {
+	async GetKeyAssetHistory(ctx, id) {
 
 		let resultsIterator = await ctx.stub.getHistoryForKey(id);
 		let results = await this.GetAllResults(resultsIterator, true);
