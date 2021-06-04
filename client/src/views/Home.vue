@@ -17,7 +17,7 @@
           <h4>Upload a new file</h4>
           <input @change="onFileChange" type="file" class="form-control" placeholder="File">
 
-          <button class="w-100 btn btn-primary mt-4" type="submit">Upload</button>
+          <button class="w-100 btn btn-primary mt-4" type="submit">Upload File</button>
         </form>
       </div>
 
@@ -58,14 +58,19 @@ export default {
   },
   async created() {
     if (this.userID && this.username){
-      const response = await service.get('file');
-
-      let result = null
-      if (response.data.data.length != 0){
-        result = response.data.data
+      try{
+        const response = await service.get('file');
+  
+        let result = null
+        if (response.data.data.length != 0){
+          result = response.data.data
+        }
+  
+        this.files = result
+      } catch (err) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
       }
-
-      this.files = result
     }
   },
   
@@ -99,7 +104,8 @@ export default {
         console.log(response);
         this.newFile = null
       } catch(err){
-        console.log(err)
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
       }
       
       this.$router.go();

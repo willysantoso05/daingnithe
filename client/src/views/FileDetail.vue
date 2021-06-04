@@ -81,7 +81,7 @@
       </table>
     </div>
 
-    <div v-if="historyFlag">
+    <div v-if="historyFlag && historyFiles">
       <h3 class="my-3 pt-3"> File History </h3>
       <table class="table">
         <thead>
@@ -146,8 +146,8 @@ export default {
         return res.ID == this.idFile
       })
     } catch (err) {
-        console.log(err.response.data.message);
-        alert(err.response.data.message);
+      console.log(err.response.data.message);
+      alert(err.response.data.message);
     }
 
     //Fetch File History
@@ -163,13 +163,12 @@ export default {
           } else {
             historyResults[i]["CanDownload"] = false;
           }
-          console.log(historyResults[i]);
         }
       }
       this.historyFiles = historyResults
     } catch (err) {
-        console.log(err.historyResponse.data.message);
-        alert(err.historyResponse.data.message);
+        console.log(err.response.data.message);
+        alert(err.response.data.message);
       }
   },
 
@@ -213,15 +212,16 @@ export default {
     async downloadFile() {
       try{
         const response = await service.get(`/file/${this.$route.params.fileID}`, {responseType:'blob'});
-        var url = window.URL.createObjectURL(response.data);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = this.file.FileName;
-        a.click();
-        a.remove();
+        if(response.data){
+          var url = window.URL.createObjectURL(response.data);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = this.file.FileName;
+          a.click();
+          a.remove();
+        }
       } catch (err) {
-        console.log(err.response.data.message);
-        alert(err.response.data.message);
+        alert("Download failed");
       }
     },
 
@@ -335,8 +335,7 @@ export default {
         a.click();
         a.remove();
       } catch (err) {
-        console.log(err.response.data.message);
-        alert(err.response.data.message);
+        alert("Download failed");
       }
     }
   }

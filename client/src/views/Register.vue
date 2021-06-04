@@ -19,7 +19,7 @@
 
 <script>
 import download from 'js-file-download';
-import axios from 'axios';
+import service from '../utils/req';
 
 export default {
 
@@ -47,11 +47,11 @@ export default {
       }
 
       try{
-        const response = await axios.post('users/register', querystring.stringify(data),{
+        const response = await service.post('users/register', querystring.stringify(data),{
                                   headers: headers,
                                   responseType: 'blob'
                                 });
-        download(response.data, "Wallet.id")
+        download(response.data, `Wallet_${this.username}.id`);
   
         this.$router.push('/login');
       } catch (err) {
