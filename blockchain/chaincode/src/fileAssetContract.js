@@ -40,7 +40,7 @@ class fileAssetContract extends Contract {
             assetJSON = assetJSON.toString();
             return assetJSON;
         } catch (err) {
-            throw new Error(`The asset ${fileId} does not exist`);
+            throw(err);
         }
     }
 
@@ -52,7 +52,7 @@ class fileAssetContract extends Contract {
             let fileAsset;
             try {
                 fileAsset = JSON.parse(assetString);
-                let accessUserList = JSON.parse(fileAsset.AccessUserList)
+                let accessUserList = JSON.parse(fileAsset.AccessUserList);
     
                 // Check if user who updates the asset has a permission to update (in granted access)
                 if (!accessUserList.hasOwnProperty(userID)) {
@@ -74,7 +74,7 @@ class fileAssetContract extends Contract {
             await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
             return JSON.stringify(fileAsset);
         } catch (err) {
-            throw new Error(`The asset ${fileId} does not exist`);
+            throw(err);
         }
     }
 
@@ -86,10 +86,11 @@ class fileAssetContract extends Contract {
             let fileAsset;
             try {
                 fileAsset = JSON.parse(assetString);
-
-                // Check if user who share access the asset has a permission to update (owner only)
-                if (fileAsset.OwnerID !== userID) {
-                    throw new Error(` userID = ${userID} has no permission to update access`);
+                let userList = JSON.parse(fileAsset.AccessUserList);
+    
+                // Check if user who update access user list of the asset has a permission to share (in granted access)
+                if (!userList.hasOwnProperty(userID)) {
+                    throw new Error(` userID = ${userID} has no permission to share access`);
                 }
 
                 // Update Field
@@ -105,7 +106,7 @@ class fileAssetContract extends Contract {
             await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
             return JSON.stringify(fileAsset);
         } catch (err) {
-            throw new Error(`The asset ${fileId} does not exist`);
+            throw (err);
         }
     }
 
@@ -147,7 +148,6 @@ class fileAssetContract extends Contract {
 
                 // Update Owner Field
                 fileAsset.OwnerID = newOwnerID;
-                // fileAsset.Version += 1;
                 fileAsset.LastUpdated = dt;
                 fileAsset.UpdatedBy = userID;
             } catch (err) {
@@ -157,7 +157,7 @@ class fileAssetContract extends Contract {
             await ctx.stub.putState(fileId, Buffer.from(JSON.stringify(fileAsset)));
             return JSON.stringify(fileAsset);
         } catch (err) {
-            throw new Error(`The asset ${fileId} does not exist`);
+            throw (err)
         }
     }
 
@@ -186,11 +186,14 @@ class fileAssetContract extends Contract {
 
     // GetAssetHistory returns the chain of custody for an asset since issuance.
 	async GetFileAssetHistory(ctx, fileID) {
-
-		let resultsIterator = await ctx.stub.getHistoryForKey(fileID);
-		let results = await this.GetAllResults(resultsIterator, true);
-
-		return JSON.stringify(results);
+        try {
+            let resultsIterator = await ctx.stub.getHistoryForKey(fileID);
+            let results = await this.GetAllResults(resultsIterator, true);
+    
+            return JSON.stringify(results);
+        } catch (err) {
+            throw (err);
+        }
 	}
 
     async GetAllResults(iterator, isHistory) {

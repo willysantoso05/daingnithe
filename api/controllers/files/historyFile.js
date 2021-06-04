@@ -4,6 +4,7 @@ const historyFileContract = require('../../script/file-contract/historyFileContr
 const wallet = require('../../script/wallet');
 
 exports.historyFile = async (req,res) => {
+    const userId = req.user._id;
     const walletId = req.user.username;
     const fileId = req.params.fileId;
     const walletData = req.wallet;
@@ -26,6 +27,15 @@ exports.historyFile = async (req,res) => {
             wallet.deleteWallet(walletId);
             return;
         } else {
+            //Validate current history
+            let currentfile = data[0];
+
+            if (!JSON.parse(currentfile.Value.AccessUserList).hasOwnProperty(userId)){
+                res.status(404).json({status:"ERROR", message: "User has no access", data:null});
+                wallet.deleteWallet(walletId);
+                return;
+            }
+
             let temp = [];
             for(let i=0; i<data.length; i++){
                 temp[i] = {
