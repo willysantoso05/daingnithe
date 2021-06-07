@@ -1,0 +1,5 @@
+api/node_modules
+client/node_modules
+blockchain/bin
+Dockerfile
+docker-compose.yml
