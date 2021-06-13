@@ -7,6 +7,7 @@
 'use strict';
 const readFileContract = require('../../script/file-contract/readFileContract');
 const transferFileContract = require('../../script/file-contract/transferFileContract');
+const updateFileOwnerKeyAsset = require('../../script/key-contract/updateFileOwnerKeyAsset');
 const wallet = require('../../script/wallet');
 
 exports.transferFile = async (req, res, next) => {
@@ -51,6 +52,24 @@ exports.transferFile = async (req, res, next) => {
             res.status(500).json({status:"ERROR", message: err, data:null});
             wallet.deleteWallet(walletId);
             return;
+        }
+
+        //Update all key asset
+        console.log("---CHANGE KEY ASSETS");
+        const listUsers = Object.keys(accessUserList);
+        for (let i = 0; i < listUsers.length; i++) {
+            const user = listUsers[i];
+            const key = accessUserList[user];
+            console.log(user.toString() + " ...... " + key.toString());
+
+            //update key transaction
+            try {
+                await updateFileOwnerKeyAsset.updateFileOwnerKeyAsset(walletId, userId, key, targetUserId);
+            } catch (err) {
+                res.status(500).json({status:"ERROR", message: err, data:null});
+                wallet.deleteWallet(walletId);
+                return;
+            }
         }
 
         res.json({
