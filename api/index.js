@@ -45,6 +45,6 @@ app.use(function(err, req, res, next) {
 		res.status(500).json({message: "Something looks wrong :( !!!"});
 });
 
-app.listen(process.env.API_PORT, function(){
-	console.log(`Node server listening on port ${process.env.API_PORT}`);
+app.listen(process.env.VUE_APP_APIPORT, function(){
+	console.log(`Node server listening on port ${process.env.VUE_APP_APIPORT}`);
 });
