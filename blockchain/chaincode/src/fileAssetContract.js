@@ -119,7 +119,7 @@ class fileAssetContract extends Contract {
                 fileAsset = JSON.parse(assetString);
 
                 // Check if user who delete the asset is the owner
-                if (fileAsset.OwnerID !== userID) {
+                if (fileAsset.OwnerID != userID) {
                     throw new Error(` userID = ${userID} has no permission to delete`);
                 }
                 
@@ -142,7 +142,7 @@ class fileAssetContract extends Contract {
                 fileAsset = JSON.parse(assetString);
 
                 // Check if user who transfers the asset is the owner
-                if (fileAsset.OwnerID !== userID) {
+                if (fileAsset.OwnerID != userID) {
                     throw new Error(` userID = ${userID} has no permission to transfer`);
                 }
 

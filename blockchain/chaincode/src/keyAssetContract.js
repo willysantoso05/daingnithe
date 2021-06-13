@@ -37,7 +37,7 @@ class keyAssetContract extends Contract {
         try{
             assetJSON = assetJSON.toString();
             // Check if user who read the asset has a permission to read (only ownerkey)
-            if (JSON.parse(assetJSON).OwnerKeyID !== userID) {
+            if (JSON.parse(assetJSON).OwnerKeyID != userID) {
                 throw new Error(` userID = ${userID} has no permission to read`);
             }
             return assetJSON;
@@ -76,6 +76,40 @@ class keyAssetContract extends Contract {
         }
     }
 
+    // UpdateKeyAsset
+    async UpdateFileOwnerKeyAsset(ctx, userID, id, newOwnerID, dt) {
+        try{
+            let assetJSON = await ctx.stub.getState(id);
+            if (!assetJSON || assetJSON.length === 0) {
+                throw new Error(`The asset ${id} does not exist`);
+            }
+            let assetString = assetJSON.toString();
+    
+            let keyAsset = JSON.parse(assetString);
+
+            // Check if user who delete the asset is the owner
+            if (keyAsset.OwnerFileID != userID) {
+                throw new Error(` userID = ${userID} has no permission to transfer`);
+            }
+
+            try {
+                // Update KeyValue Field
+                keyAsset.OwnerFileID = newOwnerID;
+                keyAsset.LastUpdated = dt;
+                keyAsset.LastUpdatedBy = userID;
+
+            } catch (err) {
+                throw new Error(`id = ${id} data can't be processed`);
+            }
+    
+            await ctx.stub.putState(id, Buffer.from(JSON.stringify(keyAsset)));
+            return JSON.stringify(keyAsset);
+
+        } catch (err) {
+            throw(err);
+        }
+    }
+
     // DeleteKeyAsset
     async DeleteKeyAsset(ctx, userID, id) {
         try {
@@ -88,11 +122,12 @@ class keyAssetContract extends Contract {
             let keyAsset = JSON.parse(assetString);
 
             // Check if user who delete the asset is the owner
-            if (keyAsset.OwnerFileID !== userID) {
+            if (keyAsset.OwnerFileID != userID) {
                 throw new Error(` userID = ${userID} has no permission to delete`);
             }
         } catch (err) {
-            throw new Error(`id = ${id} data can't be processed`);
+            throw (err)
+            // throw new Error(`id = ${id} data can't be processed`);
         }
         return await ctx.stub.deleteState(id);
     }

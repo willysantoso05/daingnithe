@@ -39,7 +39,8 @@ exports.shareFile = async (req, res, next) => {
         fileAsset = JSON.parse(fileAsset);
 
         let fileVersion = Number(fileAsset.Version) + 1;
-        let accessUserList = JSON.parse(fileAsset.AccessUserList)
+        let accessUserList = JSON.parse(fileAsset.AccessUserList);
+        const ownerFileId = fileAsset.OwnerID;
         const totalGrantedUser = Object.keys(accessUserList).length;
         const ownerKeyId = accessUserList[userId];
 
@@ -88,7 +89,7 @@ exports.shareFile = async (req, res, next) => {
             //create key transaction
             try {
                 console.log("---CREATE KEY ASSET");
-                await createKeyContract.createKeyAsset(walletId, keyID, targetUserId, fileId, userId, fileVersion, newShares[1].toString('binary'));
+                await createKeyContract.createKeyAsset(walletId, keyID, targetUserId, fileId, ownerFileId, fileVersion, newShares[1].toString('binary'));
             } catch (err) {
                 res.status(500).json({status:"ERROR", message: err, data:null});
                 wallet.deleteWallet(walletId);
